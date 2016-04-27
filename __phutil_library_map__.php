@@ -11,7 +11,6 @@ phutil_register_library_map(array(
   'class' => array(
     'ApacheThriftLinter' => 'src/ApacheThriftLinter.php',
     'GoVetLinter' => 'src/GoVetLinter.php',
-    'PythonDebuggerLinter' => 'src/PythonDebuggerLinter.php',
     'PythonImportsLinter' => 'src/PythonImportsLinter.php',
     'PythonRequirementsLinter' => 'src/PythonRequirementsLinter.php',
   ),
@@ -19,7 +18,6 @@ phutil_register_library_map(array(
   'xmap' => array(
     'ApacheThriftLinter' => 'ArcanistExternalLinter',
     'GoVetLinter' => 'ArcanistExternalLinter',
-    'PythonDebuggerLinter' => 'ArcanistLinter',
     'PythonImportsLinter' => 'ArcanistLinter',
     'PythonRequirementsLinter' => 'ArcanistLinter',
   ),

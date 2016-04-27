@@ -43,19 +43,6 @@ code constructs.
 }
 ```
 
-### Python Debugger Linter
-
-Hunts for stray Python debugger ([pdb][]) statements.
-
-[pdb]: https://docs.python.org/2/library/pdb.html
-
-```json
-"pdb": {
-    "type": "python-debugger",
-    "include": "(\\.py$)"
-}
-```
-
 ### Python Imports Linter
 
 Lints for illegal Python module imports.
