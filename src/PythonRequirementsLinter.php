@@ -71,46 +71,40 @@ final class PythonRequirementsLinter extends ArcanistLinter {
     return null;
   }
 
-  private function lintDuplicates($lines) {
+  private function formatRequirement($req) {
+    return sprintf("%s%s%s", $req['name'], $req['cmp'], $req['version']);
+  }
+
+  private function lintDuplicates(array $reqs) {
     $packages = array();
 
-    foreach ($lines as $lineno => $line) {
-      $req = $this->parseRequirement($line);
-      if ($req === null) {
-        continue;
-      }
-
+    foreach ($reqs as $lineno => $req) {
       $package = strtolower($req['name']);
       if (array_key_exists($package, $packages)) {
         $first = $packages[$package];
         $this->raiseLintAtLine(
-          $lineno + 1,
+          $lineno,
           1,
           self::LINT_DUPLICATES,
           pht(
             'This line contains a duplicate package requirement for "%s". '.
-            'The first reference appears on line %d: "%s"',
-            $package, $first[0], $first[1]),
+            'The first reference appears on line %d ("%s")',
+            $package, $first[0], $this->formatRequirement($first[1])),
           $package);
       } else {
-        $packages[$package] = array($lineno + 1, $line);
+        $packages[$package] = array($lineno, $req);
       }
     }
   }
 
-  private function lintUnsorted($lines) {
+  private function lintUnsorted(array $reqs) {
     $last = null;
 
-    foreach ($lines as $lineno => $line) {
-      $req = $this->parseRequirement($line);
-      if ($req === null) {
-        continue;
-      }
-
+    foreach ($reqs as $lineno => $req) {
       $package = $req['name'];
       if (strnatcasecmp($package, $last) <= 0) {
         $this->raiseLintAtLine(
-          $lineno + 1,
+          $lineno,
           1,
           self::LINT_UNSORTED,
           pht(
@@ -126,11 +120,20 @@ final class PythonRequirementsLinter extends ArcanistLinter {
     $lines = phutil_split_lines($this->getData($path), false);
     $lines = array_map('trim', $lines);
 
+    // Build a sparse array mapping line numbers to parsed requirements.
+    $reqs = array();
+    foreach ($lines as $lineno => $line) {
+      $req = $this->parseRequirement($line);
+      if (!empty($req)) {
+        $reqs[$lineno + 1] = $req;
+      }
+    }
+
     if ($this->isMessageEnabled(self::LINT_DUPLICATES)) {
-      $this->lintDuplicates($lines);
+      $this->lintDuplicates($reqs);
     }
     if ($this->isMessageEnabled(self::LINT_UNSORTED)) {
-      $this->lintUnsorted($lines);
+      $this->lintUnsorted($reqs);
     }
   }
 }
