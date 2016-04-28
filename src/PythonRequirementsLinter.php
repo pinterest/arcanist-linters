@@ -57,20 +57,35 @@ final class PythonRequirementsLinter extends ArcanistLinter {
     );
   }
 
+  private function parseRequirement($line) {
+    # PEP 508 (https://www.python.org/dev/peps/pep-0508/)
+    $regex = "/^(?P<name>[[:alnum:]][[:alnum:]-_.]*)".
+             "(?:\s*(?P<cmp>(~=|==|!=|<=|>=|<|>|===))\s*".
+             "(?P<version>[[:alnum:]-_.*+!]+))?/";
+
+    $matches = array();
+    if (preg_match($regex, $line, $matches)) {
+      return $matches;
+    }
+
+    return null;
+  }
+
   private function lintDuplicates($lines) {
     $packages = array();
 
     foreach ($lines as $lineno => $line) {
-      if (empty($line) || $line[0] == '#' || $line[0] == '-') {
+      $req = $this->parseRequirement($line);
+      if ($req === null) {
         continue;
       }
 
-      $package = strtolower(head(explode('==', $line)));
+      $package = strtolower($req['name']);
       if (array_key_exists($package, $packages)) {
         $first = $packages[$package];
         $this->raiseLintAtLine(
           $lineno + 1,
-          0,
+          1,
           self::LINT_DUPLICATES,
           pht(
             'This line contains a duplicate package requirement for "%s". '.
@@ -87,15 +102,16 @@ final class PythonRequirementsLinter extends ArcanistLinter {
     $last = null;
 
     foreach ($lines as $lineno => $line) {
-      if (empty($line) || $line[0] == '#' || $line[0] == '-') {
+      $req = $this->parseRequirement($line);
+      if ($req === null) {
         continue;
       }
 
-      $package = head(explode('==', $line));
+      $package = $req['name'];
       if (strnatcasecmp($package, $last) <= 0) {
         $this->raiseLintAtLine(
           $lineno + 1,
-          0,
+          1,
           self::LINT_UNSORTED,
           pht(
             "This line doesn't appear in sorted order. Please keep ".
