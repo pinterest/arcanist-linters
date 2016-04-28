@@ -1,5 +1,7 @@
 # Arcanist Linters
 
+[![Build Status](https://travis-ci.org/pinterest/arcanist-linters.svg)](https://travis-ci.org/pinterest/arcanist-linters)
+
 This is a collection of custom [Arcanist][] linters that we've written at
 Pinterest.
 
