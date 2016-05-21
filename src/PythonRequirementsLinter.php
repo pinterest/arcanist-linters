@@ -98,11 +98,19 @@ final class PythonRequirementsLinter extends ArcanistLinter {
   }
 
   private function lintUnsorted(array $reqs) {
-    $last = null;
+    $last_lineno = 0;
+    $last_package = null;
 
     foreach ($reqs as $lineno => $req) {
+      // Only require consecutive requirement lines to be ordered. If we're
+      // skipping over some other lines, clear $last_package to start a new
+      // ordered "section".
+      if ($lineno > $last_lineno + 1) {
+        $last_package = null;
+      }
+
       $package = $req['name'];
-      if (strnatcasecmp($package, $last) <= 0) {
+      if (strnatcasecmp($package, $last_package) <= 0) {
         $this->raiseLintAtLine(
           $lineno,
           1,
@@ -112,7 +120,8 @@ final class PythonRequirementsLinter extends ArcanistLinter {
             "package requirements ordered alphabetically."));
       }
 
-      $last = $package;
+      $last_lineno = $lineno;
+      $last_package = $package;
     }
   }
 
