@@ -61,7 +61,7 @@ Lints for illegal Python module imports.
 ### Python Requirements Linter
 
 Ensures Python package requirements in [requirements.txt files][req-txt] are
-sorted and unique.
+sorted, unique, and pinned to exact versions.
 
 ```json
 {

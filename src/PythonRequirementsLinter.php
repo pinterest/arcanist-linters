@@ -22,6 +22,7 @@ final class PythonRequirementsLinter extends ArcanistLinter {
 
   const LINT_DUPLICATES = 1;
   const LINT_UNSORTED = 2;
+  const LINT_UNPINNED = 3;
 
   public function getInfoName() {
     return 'Python requirements.txt Linter';
@@ -47,6 +48,7 @@ final class PythonRequirementsLinter extends ArcanistLinter {
     return array(
       self::LINT_DUPLICATES => ArcanistLintSeverity::SEVERITY_ERROR,
       self::LINT_UNSORTED => ArcanistLintSeverity::SEVERITY_WARNING,
+      self::LINT_UNPINNED => ArcanistLintSeverity::SEVERITY_WARNING,
     );
   }
 
@@ -54,6 +56,7 @@ final class PythonRequirementsLinter extends ArcanistLinter {
     return array(
       self::LINT_DUPLICATES => pht('Duplicate package requirement'),
       self::LINT_UNSORTED => pht('Unsorted package requirement'),
+      self::LINT_UNPINNED => pht('Unpinned package version'),
     );
   }
 
@@ -125,6 +128,20 @@ final class PythonRequirementsLinter extends ArcanistLinter {
     }
   }
 
+  private function lintUnpinned(array $reqs) {
+    foreach ($reqs as $lineno => $req) {
+      if ($req['cmp'] != '==') {
+        $this->raiseLintAtLine(
+          $lineno,
+          1,
+          self::LINT_UNPINNED,
+          pht(
+            "This package requirement isn't pinned to an exact version. ".
+            "Use the `==` operator to specify a version."));
+      }
+    }
+  }
+
   public function lintPath($path) {
     $lines = phutil_split_lines($this->getData($path), false);
     $lines = array_map('trim', $lines);
@@ -143,6 +160,9 @@ final class PythonRequirementsLinter extends ArcanistLinter {
     }
     if ($this->isMessageEnabled(self::LINT_UNSORTED)) {
       $this->lintUnsorted($reqs);
+    }
+    if ($this->isMessageEnabled(self::LINT_UNPINNED)) {
+      $this->lintUnpinned($reqs);
     }
   }
 }
