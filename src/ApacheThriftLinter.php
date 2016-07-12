@@ -85,7 +85,7 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
       $this->getExecutableCommand());
 
     $matches = array();
-    if (preg_match('/\b(?P<version>\d+\.\d+\.\d+)\b/', $stdout, $matches)) {
+    if (preg_match('/^Thrift version (?P<version>.*)$/', $stdout, $matches)) {
       return $matches['version'];
     } else {
       return false;
