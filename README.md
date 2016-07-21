@@ -48,6 +48,8 @@ generated using a supported Thrift compiler.
 }
 ```
 
+*Note:* Currently only generated Python files are supported.
+
 ### Go Vet Linter
 
 Uses the [Go vet command](https://golang.org/cmd/vet/) to lint for suspicious
