@@ -23,6 +23,7 @@ final class ApacheThriftGeneratedLinter extends ArcanistLinter {
   const LINT_VERSION = 1;
 
   private $requiredVersion = null;
+  private $requiredVersionSuffix = false;
   private $requiredVersionOperator = '==';
 
   public function getInfoName() {
@@ -73,6 +74,7 @@ final class ApacheThriftGeneratedLinter extends ArcanistLinter {
         } else {
           $this->requiredVersion = $value;
         }
+        $this->requiredVersionSuffix = strpos($this->requiredVersion, '-');
         return;
     }
 
@@ -100,12 +102,24 @@ final class ApacheThriftGeneratedLinter extends ArcanistLinter {
       if (preg_match($regex, $line, $matches, PREG_OFFSET_CAPTURE)) {
         list($version, $offset) = $matches['version'];
 
-        $unsupportedVersion = !version_compare(
+        // If the captured version contains contains a suffix but the required
+        // version does not, remove the suffix before performing the version
+        // comparison. This gives us the flexibility of enforcing versions
+        // across a range of custom compiler builds while also allowing us to
+        // explicitly require a specific custom version should we need one.
+        if ($this->requiredVersionSuffix === false) {
+          $suffix = strpos($version, '-');
+          if ($suffix !== false) {
+            $version = substr($version, 0, $suffix);
+          }
+        }
+
+        $unsupported = !version_compare(
           $version,
           $this->requiredVersion,
           $this->requiredVersionOperator);
 
-        if ($unsupportedVersion) {
+        if ($unsupported) {
           $this->raiseLintAtLine(
             $lineno + 1,
             $offset + 1,
