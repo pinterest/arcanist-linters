@@ -128,7 +128,21 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
-    $lines = phutil_split_lines($err ? $stderr : $stdout, false);
+    // The Thrift compiler sends warnings to STDOUT and errors to STDERR. The
+    // following code builds a single $lines array combining the lines from
+    // both output streams. Annoyingly, errors are reporting using two lines,
+    // so we perform a small amount of preprocessing so we can scan $lines
+    // using a single regular expression.
+    $lines = phutil_split_lines($stdout, false);
+    if ($err) {
+      $errors = phutil_split_lines($stderr, false);
+      for ($i = 0; $i < count($errors); $i += 2) {
+        $prefix = substr($errors[$i], 0, strpos($errors[$i], '] ') + 2);
+        $lines[] = $prefix.$errors[$i + 1];
+      }
+    }
+
+    // [SEVERITY:/path/to/file.thrift:31] Message text
     $regex = '/^\[(?P<severity>[A-Z]+):(?P<path>.*):(?P<lineno>\d+)\]\s+(?P<message>[^\(].*)$/';
 
     $messages = array();
