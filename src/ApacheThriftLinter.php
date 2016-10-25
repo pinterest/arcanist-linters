@@ -139,12 +139,6 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
     foreach ($lines as $line) {
       $matches = null;
       if (preg_match($regex, $line, $matches)) {
-        // Older versions of Thrift (<0.9) generate output for included files.
-        // Ignore any entries for files other than the active path.
-        if (!Filesystem::pathsAreEquivalent($path, $matches['path'])) {
-          continue;
-        }
-
         $message = new ArcanistLintMessage();
         $message->setPath($path);
         $message->setLine($matches['lineno']);
