@@ -99,10 +99,6 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
       'apt-get install thrift');
   }
 
-  public function shouldExpectCommandErrors() {
-    return true;
-  }
-
   protected function getMandatoryFlags() {
     if ($this->tmpdir == null) {
       $this->tmpdir = Filesystem::createTemporaryDirectory('arc-lint-thrift-');
