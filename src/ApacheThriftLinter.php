@@ -128,6 +128,10 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
+    // Resolve the active path relative to the project root. This is used
+    // below to compare against absolute paths produce by the Thrift compiler.
+    $abspath = Filesystem::resolvePath($path, $this->getProjectRoot());
+
     // The Thrift compiler sends warnings to STDOUT and errors to STDERR. The
     // following code builds a single $lines array combining the lines from
     // both output streams. Annoyingly, errors are reporting using two lines,
@@ -149,6 +153,12 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
     foreach ($lines as $line) {
       $matches = null;
       if (preg_match($regex, $line, $matches)) {
+        // The Thrift compiler will also produce output for included files.
+        // We only want to create messages associated with the current path.
+        if (!Filesystem::pathsAreEquivalent($abspath, $matches['path'])) {
+          continue;
+        }
+
         $message = new ArcanistLintMessage();
         $message->setPath($path);
         $message->setLine($matches['lineno']);
