@@ -149,6 +149,10 @@ final class PythonRequirementsLinter extends ArcanistLinter {
     // Build a sparse array mapping line numbers to parsed requirements.
     $reqs = array();
     foreach ($lines as $lineno => $line) {
+      // Ignore any lines containing `noqa` comments.
+      if (preg_match("/#\s+noqa/i", $line)) {
+        continue;
+      }
       $req = $this->parseRequirement($line);
       if (!empty($req)) {
         $reqs[$lineno + 1] = $req;
