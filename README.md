@@ -87,6 +87,12 @@ sorted, unique, and pinned to exact versions.
 }
 ```
 
+Individual requirement lines can be excluded by adding a `# noqa` comment:
+
+```
+six=>1.10.0  # noqa: allow any recent version of six
+```
+
 [req-txt]: https://pip.readthedocs.org/en/latest/user_guide/#requirements-files
 
 ## Installation
