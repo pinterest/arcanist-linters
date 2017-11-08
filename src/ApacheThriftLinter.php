@@ -140,9 +140,11 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
     $lines = phutil_split_lines($stdout, false);
     if ($err) {
       $errors = phutil_split_lines($stderr, false);
-      for ($i = 0; $i < count($errors); $i += 2) {
-        $prefix = substr($errors[$i], 0, strpos($errors[$i], '] ') + 2);
-        $lines[] = $prefix.$errors[$i + 1];
+      if (count($errors) > 1) {
+        for ($i = 0; $i < count($errors); $i += 2) {
+          $prefix = substr($errors[$i], 0, strpos($errors[$i], '] ') + 2);
+          $lines[] = $prefix.$errors[$i + 1];
+        }
       }
     }
 
