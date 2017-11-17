@@ -50,6 +50,19 @@ generated using a supported Thrift compiler.
 
 *Note:* Currently only generated Python files are supported.
 
+### Checkstyle Linter
+
+Uses the [Checkstyle](http://checkstyle.sourceforge.net/) tool to check Java
+code against a coding standard.
+
+```json
+{
+    "type": "checkstyle",
+    "include": "(\\.java$)",
+    "checkstyle.config": "google_check.xml"
+}
+```
+
 ### Go Vet Linter
 
 Uses the [Go vet command](https://golang.org/cmd/vet/) to lint for suspicious
