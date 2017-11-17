@@ -94,7 +94,7 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
 
   public function getInstallInstructions() {
     return pht(
-      'Install thrift using `%s` (OS X) or `%s` (Linux).',
+      'Install thrift using `%s` (macOS) or `%s` (Linux).',
       'brew install thrift',
       'apt-get install thrift');
   }
