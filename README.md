@@ -108,6 +108,18 @@ six>=1.10.0  # noqa: allow any recent version of six
 
 [req-txt]: https://pip.readthedocs.org/en/latest/user_guide/#requirements-files
 
+### Eslint linter
+
+Lints JavaScript and JSX files.
+
+```json
+{
+    "type": "eslint",
+    "include": "(\\.js$)",
+    "eslint.bin": "./node_modules/.bin/eslint",
+}
+```
+
 ## Installation
 
 In short, you'll need to add this repository to your local machine and tell
