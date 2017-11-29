@@ -63,6 +63,20 @@ code against a coding standard.
 }
 ```
 
+### ESLint Linter
+
+Lints JavaScript and JSX files using [ESLint](https://eslint.org/).
+
+```json
+{
+    "type": "eslint",
+    "include": "(\\.js$)",
+    "bin": "./node_modules/.bin/eslint",
+    "eslint.config": "~/my-eslint.json",
+    "eslint.env": "browser,node"
+}
+```
+
 ### Go Vet Linter
 
 Uses the [Go vet command](https://golang.org/cmd/vet/) to lint for suspicious
