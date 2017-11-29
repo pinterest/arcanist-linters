@@ -1,15 +1,17 @@
 <?php
 
-final class ArcanistEslintLinter extends ArcanistExternalLinter {
+final class ESLintLinter extends ArcanistExternalLinter {
   const ESLINT_WARNING = '1';
   const ESLINT_ERROR = '2';
 
+  private $flags = array();
+
   public function getInfoName() {
-    return 'Eslint';
+    return 'ESLint';
   }
 
   public function getInfoURI() {
-    return 'http://eslint.org/';
+    return 'https://eslint.org/';
   }
 
   public function getInfoDescription() {
@@ -28,6 +30,17 @@ final class ArcanistEslintLinter extends ArcanistExternalLinter {
     return 'eslint';
   }
 
+  public function getVersion() {
+    list($err, $stdout, $stderr) = exec_manual('%C -v', $this->getExecutableCommand());
+
+    $matches = array();
+    if (preg_match('/^v(\d\.\d\.\d)$/', $stdout, $matches)) {
+      return $matches[1];
+    } else {
+      return false;
+    }
+  }
+
   protected function getMandatoryFlags() {
     return array(
       '--format=json',
@@ -35,19 +48,19 @@ final class ArcanistEslintLinter extends ArcanistExternalLinter {
     );
   }
 
-  public function getVersion() {
-    list($err, $stdout, $stderr) = exec_manual('%C -v', $this->getExecutableCommand());
-
-    return $err
-      ? false
-      : $stdout;
+  protected function getDefaultFlags() {
+    return $this->flags;
   }
 
   public function getLinterConfigurationOptions() {
     $options = array(
-      'eslint.bin' => array(
+      'eslint.config' => array(
         'type' => 'optional string',
-        'help' => pht('Location of eslint executable. Default: (eslint)'),
+        'help' => pht('Use configuration from this file or shareable config. (https://eslint.org/docs/user-guide/command-line-interface#-c---config)'),
+      ),
+      'eslint.env' => array(
+        'type' => 'optional string',
+        'help' => pht('Specify environments. To specify multiple environments, separate them using commas. (https://eslint.org/docs/user-guide/command-line-interface#--env)'),
       ),
     );
     return $options + parent::getLinterConfigurationOptions();
@@ -55,8 +68,11 @@ final class ArcanistEslintLinter extends ArcanistExternalLinter {
 
   public function setLinterConfigurationValue($key, $value) {
     switch ($key) {
-      case 'eslint.bin':
-        $this->setBinary($value);
+      case 'eslint.config':
+        $this->flags[] = '--config ' . $value;
+        return;
+      case 'eslint.env':
+        $this->flags[] = '--env ' . $value;
         return;
     }
     return parent::setLinterConfigurationValue($key, $value);
@@ -75,6 +91,10 @@ final class ArcanistEslintLinter extends ArcanistExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
+    if ($err) {
+      return;
+    }
+
     $json = json_decode($stdout, true);
     $messages = array();
 
