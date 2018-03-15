@@ -41,7 +41,7 @@ final class PythonIsortLinter extends ArcanistExternalLinter {
   public function getLinterConfigurationName() {
     return 'isort';
   }
-  
+
   public function getDefaultBinary() {
     return 'isort';
   }
