@@ -9,6 +9,7 @@ Pinterest.
 - [ESLint](#eslint)
 - [Go Vet](#go-vet)
 - [Python Imports](#python-imports)
+- [Python isort](#python-isort)
 - [Python Requirements](#python-requirements)
 
 ## Linters
@@ -105,6 +106,17 @@ Lints for illegal Python module imports.
     "python-imports.pattern": "(mock)",
     "include": "(\\.py$)",
     "exclude": "(^tests/)"
+}
+```
+
+### Python isort
+
+Lints Python imports using [isort](https://github.com/timothycrosley/isort).
+
+```json
+{
+    "type": "isort",
+    "include": "(\\.py$)"
 }
 ```
 
