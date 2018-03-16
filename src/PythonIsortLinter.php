@@ -64,7 +64,7 @@ final class PythonIsortLinter extends ArcanistExternalLinter {
   }
 
   protected function getMandatoryFlags() {
-    return array('--check-only', '--diff', '--');
+    return array('--quiet', '--check-only', '--diff', '--');
   }
 
   protected function getDefaultMessageSeverity($code) {
@@ -72,6 +72,10 @@ final class PythonIsortLinter extends ArcanistExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
+    if (empty($stdout)) {
+        return array();
+    }
+
     // Expected output includes a single header optionally followed by a
     // multiline diff. We're only interested in the latter case (which implies
     // a lint violation), but we could also parse the header for more detailed
