@@ -68,7 +68,7 @@ final class PythonIsortLinter extends ArcanistExternalLinter {
   }
 
   protected function getDefaultMessageSeverity($code) {
-    return ArcanistLintSeverity::SEVERITY_WARNING;
+    return ArcanistLintSeverity::SEVERITY_AUTOFIX;
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
