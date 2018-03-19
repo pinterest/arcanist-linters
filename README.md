@@ -8,6 +8,7 @@ Pinterest.
 - [Checkstyle](#checkstyle)
 - [ESLint](#eslint)
 - [Go Vet](#go-vet)
+- [Prettier](#prettier)
 - [Python Imports](#python-imports)
 - [Python isort](#python-isort)
 - [Python Requirements](#python-requirements)
@@ -81,6 +82,20 @@ Lints JavaScript and JSX files using [ESLint](https://eslint.org/).
     "bin": "./node_modules/.bin/eslint",
     "eslint.config": "~/my-eslint.json",
     "eslint.env": "browser,node"
+}
+```
+
+
+### Prettier
+
+Formats JavaScript using [Prettier](https://prettier.io/).
+
+```json
+{
+    "type": "prettier",
+    "include": "(\\.js$)",
+    "bin": "./node_modules/.bin/prettier",
+    "prettier.cwd": "./"
 }
 ```
 
