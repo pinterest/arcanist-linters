@@ -9,6 +9,7 @@ Pinterest.
 - [ESLint](#eslint)
 - [Go Vet](#go-vet)
 - [Prettier](#prettier)
+- [Prettier ESLint](#prettier-eslint)
 - [Python Imports](#python-imports)
 - [Python isort](#python-isort)
 - [Python Requirements](#python-requirements)
@@ -85,6 +86,17 @@ Lints JavaScript and JSX files using [ESLint](https://eslint.org/).
 }
 ```
 
+### Go Vet
+
+Uses the [Go vet command](https://golang.org/cmd/vet/) to lint for suspicious
+code constructs.
+
+```json
+{
+    "type": "govet",
+    "include": "(^src/example.com/.*\\.go$)"
+}
+```
 
 ### Prettier
 
@@ -99,15 +111,17 @@ Formats JavaScript using [Prettier](https://prettier.io/).
 }
 ```
 
-### Go Vet
 
-Uses the [Go vet command](https://golang.org/cmd/vet/) to lint for suspicious
-code constructs.
+### Prettier ESLint
+
+Formats JavaScript using [Prettier](https://prettier.io/) and then fixes with [ESLint](https://eslint.org/).
 
 ```json
 {
-    "type": "govet",
-    "include": "(^src/example.com/.*\\.go$)"
+    "type": "prettier-eslint",
+    "include": "(\\.js$)",
+    "bin": "./node_modules/.bin/prettier-eslint",
+    "prettier-eslint.cwd": "./"
 }
 ```
 
