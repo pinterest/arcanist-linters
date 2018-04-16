@@ -66,9 +66,8 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
   }
 
   public function getDefaultBinary() {
-    list($err, $stdout, $stderr) = exec_manual('yarn -s --cwd %s which prettier-eslint', $this->getProjectRoot() . '/' . $this->cwd);
-    $binaryPath = strtok($stdout, "\n");
-    if (!empty($stderr)) {
+    list($err, $stdout, $stderr) = exec_manual('yarn -s --cwd %s bin', $this->getProjectRoot() . '/' . $this->cwd);
+    if (empty($stdout)) {
       // Copied from arcanist/master/src/lint/linter/ArcanistExternalLinter.php
       throw new ArcanistMissingLinterException(
         sprintf(
@@ -78,11 +77,12 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
             'to install the script, or adjust your linter configuration.',
             'yarn@1',
             get_class($this)),
-          pht(
-            'TO INSTALL: %s',
-            $this->getInstallInstructions())));
+            pht(
+              'TO INSTALL: %s',
+              $this->getInstallInstructions())));
     }
-    return $binaryPath;
+    $binaryPath = strtok($stdout, "\n");
+    return $binaryPath . "/prettier-eslint";
   }
 
   public function getVersion() {
@@ -117,7 +117,7 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
 
   public function getInstallInstructions() {
     return pht(
-      'run `%s` to install yarn@1 globally (needed for specifying --cwd & `yarn which`), and `%s` to add prettier-eslint-cli to your project (configurable at prettier-eslint.cwd).',
+      'run `%s` to install yarn@1 globally (needed for specifying --cwd), and `%s` to add prettier-eslint-cli to your project (configurable at prettier-eslint.cwd).',
       'npm install --global yarn@1',
       'yarn add --dev prettier-eslint-cli'
     );
