@@ -118,6 +118,7 @@ final class ESLintLinter extends ArcanistExternalLinter {
 
     foreach ($json as $file) {
       foreach ($file['messages'] as $offense) {
+        $offense['source'] = $file['filePath'];
         $message = new ArcanistLintMessage();
         $message->setPath($file['filePath']);
         $message->setSeverity($this->mapSeverity($offense['severity']));
