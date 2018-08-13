@@ -125,7 +125,9 @@ final class ESLintLinter extends ArcanistExternalLinter {
         $message->setDescription($offense['message']);
         $message->setLine($offense['line']);
         $message->setChar($offense['column']);
-        $message->setCode($offense['source']);
+        if(array_key_exists('source', $offense)){
+            $message->setCode($offense['source']);
+        }
         $messages[] = $message;
       }
     }
