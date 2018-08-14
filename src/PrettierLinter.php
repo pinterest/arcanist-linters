@@ -47,6 +47,7 @@ final class PrettierLinter extends ArcanistExternalLinter {
     return $binaryPath;
   }
 
+    
   public function getVersion() {
     list($err, $stdout, $stderr) = exec_manual('%C -v', $this->getExecutableCommand());
     return $stdout;
@@ -84,6 +85,10 @@ final class PrettierLinter extends ArcanistExternalLinter {
       return false;
     }
 
+    if($this->getData($path)==$stdout){
+        return array();
+    }
+    
     $message = new ArcanistLintMessage();
     $message->setPath($path);
     $message->setSeverity(ArcanistLintSeverity::SEVERITY_AUTOFIX);
@@ -91,7 +96,7 @@ final class PrettierLinter extends ArcanistExternalLinter {
     $message->setLine(1);
     $message->setCode($this->getLinterName());
     $message->setChar(1);
-    $message->setDescription('Your file has not been prettier-ified');
+    $message->setDescription('This file has not been prettier-ified');
     $message->setOriginalText($this->getData($path));
     $message->setReplacementText($stdout);
     $messages[] = $message;
