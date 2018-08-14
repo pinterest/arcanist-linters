@@ -45,7 +45,7 @@ final class ESLintLinter extends ArcanistExternalLinter {
   }
 
   public function getDefaultBinary() {
-    return 'eslint';
+    return __DIR__ . "/.eslint-zero.sh";
   }
 
   public function getVersion() {

@@ -42,9 +42,7 @@ final class PrettierLinter extends ArcanistExternalLinter {
   }
 
   public function getDefaultBinary() {
-    list($err, $stdout, $stderr) = exec_manual('yarn -s --cwd %s which prettier', $this->getProjectRoot() . '/' . $this->cwd);
-    $binaryPath = strtok($stdout, "\n");
-    return $binaryPath;
+      return __DIR__ . "/.prettier-zero.sh";
   }
 
     
