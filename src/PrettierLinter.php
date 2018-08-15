@@ -83,7 +83,7 @@ final class PrettierLinter extends ArcanistExternalLinter {
       return false;
     }
 
-    if($this->getData($path)==$stdout){
+    if ($this->getData($path) == $stdout || $stdout == "") {
         return array();
     }
     
