@@ -66,23 +66,22 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
   }
 
   public function getDefaultBinary() {
-    list($err, $stdout, $stderr) = exec_manual('yarn -s --cwd %s bin', $this->getProjectRoot() . '/' . $this->cwd);
-    if (empty($stdout)) {
-      // Copied from arcanist/master/src/lint/linter/ArcanistExternalLinter.php
-      throw new ArcanistMissingLinterException(
-        sprintf(
-          "%s\n%s",
-          pht(
-            'Unable to locate script "%s" to run linter %s. You may need '.
-            'to install the script, or adjust your linter configuration.',
-            'yarn@1',
-            get_class($this)),
-            pht(
-              'TO INSTALL: %s',
-              $this->getInstallInstructions())));
+    if ($this->cwd) {
+      $realCWD = Filesystem::resolvePath($this->cwd, $this->getProjectRoot());
+      list($err, $stdout, $stderr) = exec_manual('yarn -s --cwd %s bin prettier-eslint', $realCWD);
+      if ($stdout) {
+        return strtok($stdout, "\n");
+      }
+    } else {
+      $localBinaryPath = Filesystem::resolvePath('./node_modules/.bin/prettier-eslint');
+
+      if (Filesystem::binaryExists($localBinaryPath)) {
+        return $localBinaryPath;
+      }
     }
-    $binaryPath = strtok($stdout, "\n");
-    return $binaryPath . "/prettier-eslint";
+
+    // Fallback on global install & fallthrough to internal existence checks
+    return 'prettier-eslint';
   }
 
   public function getVersion() {
@@ -117,15 +116,26 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
 
   public function getInstallInstructions() {
     return pht(
-      'run `%s` to install yarn@1 globally (needed for specifying --cwd), and `%s` to add prettier-eslint-cli to your project (configurable at prettier-eslint.cwd).',
-      'npm install --global yarn@1',
-      'yarn add --dev prettier-eslint-cli'
+      "\n\t%s[%s globally] run: `%s`\n\t[%s locally] run either: `%s` OR `%s`",
+      $this->cwd ? pht("[%s globally] (required for %s) run: `%s`\n\t",
+        'yarn',
+        '--cwd',
+        'npm install --global yarn@1') : '',
+      'prettier-eslint',
+      'npm install --global prettier-eslint',
+      'prettier-eslint',
+      'npm install --save-dev prettier-eslint',
+      'yarn add --dev prettier-eslint'
     );
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
     if ($err) {
       return false;
+    }
+
+    if ($this->getData($path) == $stdout) {
+        return array();
     }
 
     $originalText = $this->getData($path);
@@ -140,7 +150,7 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
       $message->setLine(1);
       $message->setCode($this->getLinterName());
       $message->setChar(1);
-      $message->setDescription('Your file has not been prettier-eslint-ified');
+      $message->setDescription('This file has not been prettier-eslint-ified');
       $message->setOriginalText($originalText);
       $message->setReplacementText($stdout);
       $messages[] = $message;
