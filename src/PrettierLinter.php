@@ -42,7 +42,23 @@ final class PrettierLinter extends ArcanistExternalLinter {
   }
 
   public function getDefaultBinary() {
-      return __DIR__ . "/.prettier-zero.sh";
+    list($err, $stdout, $stderr) = exec_manual('yarn -s --cwd %s bin', $this->getProjectRoot() . '/' . $this->cwd);
+    if (empty($stdout)) {
+      // Copied from arcanist/master/src/lint/linter/ArcanistExternalLinter.php
+      throw new ArcanistMissingLinterException(
+        sprintf(
+          "%s\n%s",
+          pht(
+            'Unable to locate script "%s" to run linter %s. You may need '.
+            'to install the script, or adjust your linter configuration.',
+            'yarn@1',
+            get_class($this)),
+            pht(
+              'TO INSTALL: %s',
+              $this->getInstallInstructions())));
+    }
+    $binaryPath = strtok($stdout, "\n");
+    return $binaryPath . "/prettier";
   }
 
     
