@@ -22,6 +22,7 @@ final class ESLintLinter extends ArcanistExternalLinter {
   const ESLINT_WARNING = '1';
   const ESLINT_ERROR = '2';
 
+  private $cwd = '';
   private $flags = array();
 
   public function getInfoName() {
@@ -45,6 +46,21 @@ final class ESLintLinter extends ArcanistExternalLinter {
   }
 
   public function getDefaultBinary() {
+    if ($this->cwd) {
+      $realCWD = Filesystem::resolvePath($this->cwd, $this->getProjectRoot());
+      list($err, $stdout, $stderr) = exec_manual('yarn -s --cwd %s bin eslint', $realCWD);
+      if ($stdout) {
+        return strtok($stdout, "\n");
+      }
+    } else {
+      $localBinaryPath = Filesystem::resolvePath('./node_modules/.bin/eslint');
+
+      if (Filesystem::binaryExists($localBinaryPath)) {
+        return $localBinaryPath;
+      }
+    }
+
+    // Fallback on global install & fallthrough to internal existence checks
     return 'eslint';
   }
 
@@ -76,9 +92,17 @@ final class ESLintLinter extends ArcanistExternalLinter {
         'type' => 'optional string',
         'help' => pht('Use configuration from this file or shareable config. (https://eslint.org/docs/user-guide/command-line-interface#-c---config)'),
       ),
+      'eslint.cwd' => array(
+        'type' => 'optional string',
+        'help' => pht('Specify a project sub-directory for both the local eslint-cli install and the sub-directory to lint within.'),
+      ),
       'eslint.env' => array(
         'type' => 'optional string',
         'help' => pht('Specify environments. To specify multiple environments, separate them using commas. (https://eslint.org/docs/user-guide/command-line-interface#--env)'),
+      ),
+      'eslint.fix' => array(
+        'type' => 'optional bool',
+        'help' => pht('Specify whether eslint should autofix issues. (https://eslint.org/docs/user-guide/command-line-interface#fixing-problems)'),
       ),
     );
     return $options + parent::getLinterConfigurationOptions();
@@ -89,8 +113,16 @@ final class ESLintLinter extends ArcanistExternalLinter {
       case 'eslint.config':
         $this->flags[] = '--config ' . $value;
         return;
+      case 'eslint.cwd':
+        $this->cwd = $value;
+        return;
       case 'eslint.env':
         $this->flags[] = '--env ' . $value;
+        return;
+      case 'eslint.fix':
+        if ($value) {
+          $this->flags[] = '--fix ';
+        }
         return;
     }
     return parent::setLinterConfigurationValue($key, $value);
@@ -98,9 +130,16 @@ final class ESLintLinter extends ArcanistExternalLinter {
 
   public function getInstallInstructions() {
     return pht(
-      'run `%s` to install eslint globally, or `%s` to add it to your project.',
+      "\n\t%s[%s globally] run: `%s`\n\t[%s locally] run either: `%s` OR `%s`",
+      $this->cwd ? pht("[%s globally] (required for %s) run: `%s`\n\t",
+        'yarn',
+        '--cwd',
+        'npm install --global yarn@1') : '',
+      'eslint',
       'npm install --global eslint',
-      'npm install --save-dev eslint'
+      'eslint',
+      'npm install --save-dev eslint',
+      'yarn add --dev eslint'
     );
   }
 
@@ -109,8 +148,9 @@ final class ESLintLinter extends ArcanistExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
-    if ($err) {
-      return;
+    // Gate on $stderr b/c $err (exit code) is expected.
+    if ($stderr) {
+      return false;
     }
 
     $json = json_decode($stdout, true);
@@ -125,8 +165,9 @@ final class ESLintLinter extends ArcanistExternalLinter {
         $message->setDescription($offense['message']);
         $message->setLine($offense['line']);
         $message->setChar($offense['column']);
-        $source = array_key_exists('source', $offense) ? $offense['source'] : $file['filePath'];
-        $message->setCode($source);
+        if (array_key_exists('source', $offense)) {
+            $message->setCode($offense['source']);
+        }
         $messages[] = $message;
       }
     }
