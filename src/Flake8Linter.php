@@ -60,7 +60,7 @@ final class Flake8Linter extends ArcanistExternalLinter {
       ),
       'flake8.python' => array(
         'type' => 'optional string',
-        'help' => pht('Python interpretter version requirement.'),
+        'help' => pht('Python version requirement.'),
       ),
     );
 
