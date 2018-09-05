@@ -50,9 +50,9 @@ final class Flake8Linter extends ArcanistExternalLinter {
 
   public function getLinterConfigurationOptions() {
     $options = array(
-      'install' => array(
+      'flake8.install' => array(
         'type' => 'optional string',
-        'help' => pht("Installation instructions."),
+        'help' => pht('Installation instructions.'),
       ),
       'flake8.extensions' => array(
         'type' => 'optional map<string, string>',
@@ -69,7 +69,7 @@ final class Flake8Linter extends ArcanistExternalLinter {
 
   public function setLinterConfigurationValue($key, $value) {
     switch ($key) {
-      case 'install':
+      case 'flake8.install':
         $this->installInstructions = $value;
         return;
       case 'flake8.extensions':
