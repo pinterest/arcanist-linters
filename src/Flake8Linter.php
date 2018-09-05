@@ -115,7 +115,7 @@ final class Flake8Linter extends ArcanistExternalLinter {
   public function getVersion() {
     list($stdout) = execx('%C --version', $this->getExecutableCommand());
 
-    $regex = 
+    $regex =
       '/^(?P<version>\d+\.\d+(?:\.\d+)?) '. # flake8 version
       '\((?P<extensions>.*)\) '.            # extension list
       '.*(?P<python>\d+\.\d+\.\d+)/';       # python version
