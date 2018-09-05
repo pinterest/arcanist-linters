@@ -7,6 +7,7 @@ Pinterest.
 - [Apache Thrift Generated](#apache-thrift-generated)
 - [Checkstyle](#checkstyle)
 - [ESLint](#eslint)
+- [Flake8](#flake8)
 - [Go Vet](#go-vet)
 - [Prettier](#prettier)
 - [Prettier ESLint](#prettier-eslint)
@@ -83,6 +84,24 @@ Lints JavaScript and JSX files using [ESLint](https://eslint.org/).
     "bin": "./node_modules/.bin/eslint",
     "eslint.config": "~/my-eslint.json",
     "eslint.env": "browser,node"
+}
+```
+
+### Flake8
+
+Lints Python source files using [Flake8](http://flake8.pycqa.org/). This is an
+extended version of the stock `ArcanistFlake8Linter` that adds support for
+checking required Python and extension versions.
+
+```json
+{
+    "type": "flake8ext",
+    "include": "(\\.py$)",
+    "flake8.python": "< 3.0",
+    "flake8.extensions": {
+        "assertive": "1.0.1",
+        "naming": "0.7.0"
+    }
 }
 ```
 
