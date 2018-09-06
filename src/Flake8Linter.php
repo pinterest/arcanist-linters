@@ -130,8 +130,8 @@ final class Flake8Linter extends ArcanistExternalLinter {
         '%s requires %s using Python version %s but found Python version %s.',
         get_class($this),
         $this->getBinary(),
-        $matches['python'],
-        $this->pythonVersion);
+        $this->pythonVersion,
+        $matches['python']);
       throw new ArcanistMissingLinterException($message);
     }
 
