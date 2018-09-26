@@ -2,7 +2,7 @@
 * @jparise
 
 # ESLint + Prettier
-ESLintLinter.php @CrabDude
-PrettierESLintLinter.php @CrabDude
-PrettierLinter.php @CrabDude
-node4_proxy @CrabDude
+src/ESLintLinter.php @CrabDude
+src/PrettierESLintLinter.php @CrabDude
+src/PrettierLinter.php @CrabDude
+src/node4_proxy @CrabDude
