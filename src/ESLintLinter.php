@@ -111,13 +111,15 @@ final class ESLintLinter extends ArcanistExternalLinter {
   public function setLinterConfigurationValue($key, $value) {
     switch ($key) {
       case 'eslint.config':
-        $this->flags[] = '--config ' . $value;
+        $this->flags[] = '--config';
+        $this->flags[] = $value;
         return;
       case 'eslint.cwd':
         $this->cwd = $value;
         return;
       case 'eslint.env':
-        $this->flags[] = '--env ' . $value;
+        $this->flags[] = '--env ';
+        $this->flags[] = $value;
         return;
       case 'eslint.fix':
         if ($value) {
