@@ -15,6 +15,8 @@ Pinterest.
 - [Python isort](#python-isort)
 - [Python Requirements](#python-requirements)
 
+We also welcome additional [contributions](CONTRIBUTING.md).
+
 ## Linters
 
 ### Apache Thrift
