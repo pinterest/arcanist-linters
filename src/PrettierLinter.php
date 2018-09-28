@@ -118,6 +118,7 @@ final class PrettierLinter extends ArcanistExternalLinter {
     $message->setDescription('This file has not been prettier-ified');
     $message->setOriginalText($this->getData($path));
     $message->setReplacementText($stdout);
+    $message->setBypassChangedLineFiltering(true);
     $messages[] = $message;
 
     return $messages;

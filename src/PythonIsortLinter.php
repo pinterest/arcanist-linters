@@ -134,7 +134,8 @@ final class PythonIsortLinter extends ArcanistExternalLinter {
           ->setSeverity($this->getLintMessageSeverity(self::LINT_STYLE))
           ->setName('Python imports style')
           ->setOriginalText(join("\n", $orig))
-          ->setReplacementText(join("\n", $repl));
+          ->setReplacementText(join("\n", $repl))
+          ->setBypassChangedLineFiltering(true);
       }
     }
 

@@ -153,6 +153,7 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
       $message->setDescription('This file has not been prettier-eslint-ified');
       $message->setOriginalText($originalText);
       $message->setReplacementText($stdout);
+      $message->setBypassChangedLineFiltering(true);
       $messages[] = $message;
     }
 
