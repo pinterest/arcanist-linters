@@ -97,7 +97,7 @@ final class CheckstyleLinter extends ArcanistExternalLinter {
     // [ERROR] /path/to/file.java:31: Message text [Indentation]
     // [WARN] /path/to/file.java:31:10: Message text [Indentation]
     $regex = '/^\[(?P<severity>[A-Z]+)\] '.
-      '(?P<path>.*):(?P<line>\d+):(?:(?P<char>\d+):)? '.
+      '(?P<path>.*?):(?P<line>\d+):(?:(?P<char>\d+):)? '.
       '(?P<message>.*) \[(?P<type>.*)\]$/';
 
     $messages = array();
