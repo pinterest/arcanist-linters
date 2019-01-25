@@ -64,7 +64,8 @@ final class PythonRequirementsLinter extends ArcanistLinter {
     # PEP 508 (https://www.python.org/dev/peps/pep-0508/)
     $regex = "/^(?P<name>[[:alnum:]][[:alnum:]-_.]*)".
              "(?:\s*(?P<cmp>(~=|==|!=|<=|>=|<|>|===))\s*".
-             "(?P<version>[[:alnum:]-_.*+!]+))?/";
+             "(?P<version>[[:alnum:]-_.*+!]+))?".
+             "(?:\s*;\s*(?P<environment>[^#]*))?/";
 
     $matches = array();
     if (preg_match($regex, $line, $matches)) {
@@ -83,8 +84,9 @@ final class PythonRequirementsLinter extends ArcanistLinter {
 
     foreach ($reqs as $lineno => $req) {
       $package = strtolower($req['name']);
-      if (array_key_exists($package, $packages)) {
-        $first = $packages[$package];
+      $environment = strtolower(idx($req, 'environment', ''));
+      if (array_key_exists($package.$environment, $packages)) {
+        $first = $packages[$package.$environment];
         $this->raiseLintAtLine(
           $lineno,
           1,
@@ -95,7 +97,7 @@ final class PythonRequirementsLinter extends ArcanistLinter {
             $package, $first[0], $this->formatRequirement($first[1])),
           $package);
       } else {
-        $packages[$package] = array($lineno, $req);
+        $packages[$package.$environment] = array($lineno, $req);
       }
     }
   }
@@ -103,6 +105,7 @@ final class PythonRequirementsLinter extends ArcanistLinter {
   private function lintUnsorted(array $reqs) {
     $last_lineno = 0;
     $last_package = null;
+    $last_version = null;
 
     foreach ($reqs as $lineno => $req) {
       // Only require consecutive requirement lines to be ordered. If we're
@@ -110,10 +113,18 @@ final class PythonRequirementsLinter extends ArcanistLinter {
       // ordered "section".
       if ($lineno > $last_lineno + 1) {
         $last_package = null;
+        $last_version = null;
       }
 
       $package = $req['name'];
-      if (strnatcasecmp($package, $last_package) <= 0) {
+      $version = $req['version'];
+
+      // If the package names aren't sorted, or if the versions aren't sorted
+      // for the same package name (presumably with different environment
+      // markers), raise a warning.
+      if ((strnatcasecmp($package, $last_package) < 0) ||
+          ((strnatcasecmp($package, $last_package) == 0) &&
+           (strnatcasecmp($version, $last_version) < 0))) {
         $this->raiseLintAtLine(
           $lineno,
           1,
@@ -125,6 +136,7 @@ final class PythonRequirementsLinter extends ArcanistLinter {
 
       $last_lineno = $lineno;
       $last_package = $package;
+      $last_version = $version;
     }
   }
 
