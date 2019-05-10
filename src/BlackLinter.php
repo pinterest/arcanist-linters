@@ -73,7 +73,7 @@ public function getLinterPriority() {
   }
 
   protected function getMandatoryFlags() {
-    $flags = array('-q');
+    $flags = array('--quiet');
     if ($this->linelen != null) {
         array_push($flags, '--line-length', $this->linelen);
     }
