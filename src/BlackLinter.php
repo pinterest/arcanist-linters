@@ -72,7 +72,7 @@ final class BlackLinter extends ArcanistExternalLinter {
   protected function getMandatoryFlags() {
     $flags = array('-q');
     if ($this->linelen != null) {
-        array_push($flags, '-l', $this->linelen);
+        array_push($flags, '--line-length', $this->linelen);
     }
     return $flags;
   }
