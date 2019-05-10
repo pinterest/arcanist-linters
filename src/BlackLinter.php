@@ -43,7 +43,7 @@ final class BlackLinter extends ArcanistExternalLinter {
 
   public function getLinterPriority() {
     return 0.01;
-}
+  }
   public function getDefaultBinary() {
     return 'black';
   }
