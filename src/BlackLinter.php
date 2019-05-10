@@ -26,7 +26,7 @@ final class BlackLinter extends ArcanistExternalLinter {
   }
 
   public function getInfoURI() {
-    return 'https://black.readthedocs.io/en/stable/';
+    return 'https://black.readthedocs.io/';
   }
 
   public function getInfoDescription() {
