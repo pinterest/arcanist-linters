@@ -65,7 +65,7 @@ generated using a supported Thrift compiler.
 
 ### Black
 
-Uses the [Black](http://checkstyle.sourceforge.net/) opinionated code formatter
+Uses the [Black](https://black.readthedocs.io/) opinionated code formatter
 to normalize the format of Python code.
 
 ```json
