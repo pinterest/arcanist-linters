@@ -5,6 +5,7 @@ Pinterest.
 
 - [Apache Thrift](#apache-thrift)
 - [Apache Thrift Generated](#apache-thrift-generated)
+- [Black](#black)
 - [Checkstyle](#checkstyle)
 - [ESLint](#eslint)
 - [Flake8](#flake8)
@@ -61,6 +62,21 @@ generated using a supported Thrift compiler.
 ```
 
 *Note:* Currently only generated Python files are supported.
+
+### Black
+
+Uses the [Black](http://checkstyle.sourceforge.net/) opinionated code formatter
+to normalize the format of Python code.
+
+```json
+{
+    "type": "black",
+    "include": "(\\.py$)",
+    "black.linelen": 132
+}
+```
+
+Note: It is recommended to place black before other linters
 
 ### Checkstyle
 
