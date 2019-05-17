@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2018 Pinterest, Inc.
+ * Copyright 2019 Pinterest, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 final class PythonIsortLinter extends ArcanistExternalLinter {
 
   const LINT_STYLE = 1;
+
+  private $version = null;
 
   public function getInfoName() {
     return 'isort';
@@ -53,7 +55,8 @@ final class PythonIsortLinter extends ArcanistExternalLinter {
 
     $matches = array();
     if (preg_match('/^(?P<version>\d+\.\d+\.\d+)$/', $stderr, $matches)) {
-      return $matches['version'];
+      $this->version = $matches['version'];
+      return $this->version;
     } else {
       return false;
     }
@@ -64,7 +67,13 @@ final class PythonIsortLinter extends ArcanistExternalLinter {
   }
 
   protected function getMandatoryFlags() {
-    return array('--quiet', '--check-only', '--diff', '--');
+    $flags = array('--quiet', '--check-only', '--diff');
+    if (version_compare($this->version, '4.3.18', '>=')) {
+      $flags[] = '--filter-files';
+    }
+    $flags[] = '--';
+
+    return $flags;
   }
 
   protected function getDefaultMessageSeverity($code) {
