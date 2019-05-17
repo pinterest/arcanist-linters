@@ -52,7 +52,7 @@ final class PythonIsortLinter extends ArcanistExternalLinter {
       $this->getExecutableCommand());
 
     $matches = array();
-    if (preg_match('/^(?P<version>\d+\.\d+\.\d+)$/', $stdout, $matches)) {
+    if (preg_match('/^(?P<version>\d+\.\d+\.\d+)$/', $stderr, $matches)) {
       return $matches['version'];
     } else {
       return false;
