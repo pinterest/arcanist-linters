@@ -163,7 +163,7 @@ final class ESLintLinter extends ArcanistExternalLinter {
         $message = new ArcanistLintMessage();
         $message->setPath($file['filePath']);
         $message->setSeverity($this->mapSeverity($offense['severity']));
-        $message->setName($offense['ruleId']);
+        $message->setName($offense['ruleId'] || 'unknown');
         $message->setDescription($offense['message']);
         $message->setLine($offense['line']);
         $message->setChar($offense['column']);
