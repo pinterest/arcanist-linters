@@ -160,6 +160,13 @@ final class ESLintLinter extends ArcanistExternalLinter {
 
     foreach ($json as $file) {
       foreach ($file['messages'] as $offense) {
+        // Skip file ignored warning: if a file is ignored by .eslintingore
+        // but linted explicitly (by arcanist), a warning will be reported,
+        // containing only: `{fatal:false,serverity:1,message:...}`.
+        if (strpos($offense['message'], "File ignored because") === 0) {
+          continue;
+        }
+
         $message = new ArcanistLintMessage();
         $message->setPath($file['filePath']);
         $message->setSeverity($this->mapSeverity($offense['severity']));
