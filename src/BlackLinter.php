@@ -19,7 +19,8 @@
  * Formats Python files using Black
  */
 final class BlackLinter extends ArcanistExternalLinter {
-  private $linelen = null;
+  private $linelen = null; 
+  private $normalizestring = true;
 
   public function getInfoName() {
     return 'Black';
@@ -59,6 +60,10 @@ final class BlackLinter extends ArcanistExternalLinter {
         'type' => 'optional int',
         'help' => pht('Specify a non-default line length for black'),
       ),
+      'black.normalizestring' => array(
+        'type' => 'optional bool',
+        'help' => pht('Whether '),
+      ),
     );
     return $options + parent::getLinterConfigurationOptions();
   }
@@ -67,6 +72,9 @@ final class BlackLinter extends ArcanistExternalLinter {
     switch ($key) {
       case 'black.linelen':
         $this->linelen = $value;
+        return;
+      case 'black.normalizestring':
+        $this->normalizestring = $value;
         return;
     }
     return parent::setLinterConfigurationValue($key, $value);
@@ -85,10 +93,18 @@ final class BlackLinter extends ArcanistExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
-    if ($err == 123 or $stderr) {
-      return false;
+    $lines = phutil_split_lines($stderr, false);
+    $messages = array();
+    $message = new ArcanistLintMessage();
+    $message->setPath($path);
+    $message->setName($this->getLinterName());
+    if ($this->normalizestring) {
+      $message->setDescription("Please run `black ".$path."`\n");
     } else {
-      return array();
+      $message->setDescription("Please run `black -S ".$path."`\n");
     }
+    $message->setSeverity($this->getLintMessageSeverity('1'));
+    $messages[] = $message;
+    return $messages;
   }
 }
