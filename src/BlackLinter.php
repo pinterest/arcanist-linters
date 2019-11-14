@@ -19,8 +19,6 @@
  * Formats Python files using Black
  */
 final class BlackLinter extends ArcanistExternalLinter {
-  private $linelen = null; 
-  private $normalizestring = true;
 
   public function getInfoName() {
     return 'Black';
@@ -54,57 +52,21 @@ final class BlackLinter extends ArcanistExternalLinter {
     return trim(str_replace('black, version', '', $stdout));
   }
 
-  public function getLinterConfigurationOptions() {
-    $options = array(
-      'black.linelen' => array(
-        'type' => 'optional int',
-        'help' => pht('Specify a non-default line length for black'),
-      ),
-      'black.normalizestring' => array(
-        'type' => 'optional bool',
-        'help' => pht('Whether to normalize strings'),
-      ),
-    );
-    return $options + parent::getLinterConfigurationOptions();
-  }
-
-  public function setLinterConfigurationValue($key, $value) {
-    switch ($key) {
-      case 'black.linelen':
-        $this->linelen = $value;
-        return;
-      case 'black.normalizestring':
-        $this->normalizestring = $value;
-        return;
-    }
-    return parent::setLinterConfigurationValue($key, $value);
-  }
-
-  protected function getMandatoryFlags() {
-    $flags = array('--check');
-    if (!$this->normalizestring) {
-        array_push($flags, '--skip-string-normalization');
-    }
-    if ($this->linelen != null) {
-        array_push($flags, '--line-length', $this->linelen);
-    }
-    return $flags;
-  }
-
   public function getInstallInstructions() {
     return pht('pip3 install black');
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
+    $flags = $this->getCommandFlags();
+
+    // Remove --check flag since instructions to user should be to fix lint errors 
+    unset($flags[array_search('--check', $flags)]);
+
     $lines = phutil_split_lines($stderr, false);
     $message = new ArcanistLintMessage();
     $message->setPath($path);
     $message->setName($this->getLinterName());
-    if ($this->normalizestring) {
-      $message->setDescription("Please run `black ".$path."`\n");
-    } else {
-      $message->setDescription("Please run `black -S ".$path."`\n");
-    }
+    $message->setDescription("Please run `black ".join(" ", $flags)." ".$path."`\n");
     $message->setSeverity($this->getLintMessageSeverity('1'));
     $messages[] = $message;
     return $messages;
