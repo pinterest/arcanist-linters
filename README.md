@@ -72,7 +72,7 @@ to normalize the format of Python code.
 {
     "type": "black",
     "include": "(\\.py$)",
-    "black.linelen": 132
+    "flags": ["--check", "-S", "--line-length=132"]
 }
 ```
 
