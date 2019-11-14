@@ -97,7 +97,6 @@ final class BlackLinter extends ArcanistExternalLinter {
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
     $lines = phutil_split_lines($stderr, false);
-    $messages = array();
     $message = new ArcanistLintMessage();
     $message->setPath($path);
     $message->setName($this->getLinterName());
