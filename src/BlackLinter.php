@@ -81,7 +81,10 @@ final class BlackLinter extends ArcanistExternalLinter {
   }
 
   protected function getMandatoryFlags() {
-    $flags = array('--quiet');
+    $flags = array('--check');
+    if (!$this->normalizestring) {
+        array_push($flags, '--skip-string-normalization');
+    }
     if ($this->linelen != null) {
         array_push($flags, '--line-length', $this->linelen);
     }
