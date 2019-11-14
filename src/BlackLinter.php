@@ -62,7 +62,7 @@ final class BlackLinter extends ArcanistExternalLinter {
       ),
       'black.normalizestring' => array(
         'type' => 'optional bool',
-        'help' => pht('Whether '),
+        'help' => pht('Whether to normalize strings'),
       ),
     );
     return $options + parent::getLinterConfigurationOptions();
