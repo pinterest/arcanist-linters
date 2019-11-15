@@ -19,7 +19,6 @@
  * Formats Python files using Black
  */
 final class BlackLinter extends ArcanistExternalLinter {
-  private $linelen = null;
 
   public function getInfoName() {
     return 'Black';
@@ -53,33 +52,6 @@ final class BlackLinter extends ArcanistExternalLinter {
     return trim(str_replace('black, version', '', $stdout));
   }
 
-  public function getLinterConfigurationOptions() {
-    $options = array(
-      'black.linelen' => array(
-        'type' => 'optional int',
-        'help' => pht('Specify a non-default line length for black'),
-      ),
-    );
-    return $options + parent::getLinterConfigurationOptions();
-  }
-
-  public function setLinterConfigurationValue($key, $value) {
-    switch ($key) {
-      case 'black.linelen':
-        $this->linelen = $value;
-        return;
-    }
-    return parent::setLinterConfigurationValue($key, $value);
-  }
-
-  protected function getMandatoryFlags() {
-    $flags = array('--quiet');
-    if ($this->linelen != null) {
-        array_push($flags, '--line-length', $this->linelen);
-    }
-    return $flags;
-  }
-
   public function getInstallInstructions() {
     return pht('pip3 install black');
   }
@@ -87,8 +59,17 @@ final class BlackLinter extends ArcanistExternalLinter {
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
     if ($err == 123 or $stderr) {
       return false;
-    } else {
-      return array();
     }
+    $flags = $this->getCommandFlags();
+    // Remove --check flag since instructions to user should be to fix lint errors 
+    unset($flags[array_search('--check', $flags)]);
+
+    $message = new ArcanistLintMessage();
+    $message->setPath($path);
+    $message->setName($this->getLinterName());
+    $message->setDescription("Please run `black ".join(" ", $flags)." ".$path."`\n");
+    $message->setSeverity(ArcanistLintSeverity::SEVERITY_ADVICE);
+    $messages[] = $message;
+    return $messages;
   }
 }
