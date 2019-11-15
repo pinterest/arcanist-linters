@@ -67,7 +67,7 @@ final class BlackLinter extends ArcanistExternalLinter {
     $message = new ArcanistLintMessage();
     $message->setPath($path);
     $message->setName($this->getLinterName());
-    $message->setDescription("Please run `".$this->getLinterConfigurationName()." ".join(" ", $flags)." ".$path."`\n");
+    $message->setDescription("Please run `black ".join(" ", $flags)." ".$path."`\n");
     $message->setSeverity(ArcanistLintSeverity::SEVERITY_ADVICE);
     $messages[] = $message;
     return $messages;
