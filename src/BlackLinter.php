@@ -57,17 +57,18 @@ final class BlackLinter extends ArcanistExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
+    if ($err == 123 or $stderr) {
+      return false;
+    }
     $flags = $this->getCommandFlags();
-
     // Remove --check flag since instructions to user should be to fix lint errors 
     unset($flags[array_search('--check', $flags)]);
 
-    $lines = phutil_split_lines($stderr, false);
     $message = new ArcanistLintMessage();
     $message->setPath($path);
     $message->setName($this->getLinterName());
-    $message->setDescription("Please run `black ".join(" ", $flags)." ".$path."`\n");
-    $message->setSeverity($this->getLintMessageSeverity('1'));
+    $message->setDescription("Please run `".$this->getLinterConfigurationName()." ".join(" ", $flags)." ".$path."`\n");
+    $message->setSeverity(ArcanistLintSeverity::SEVERITY_ADVICE);
     $messages[] = $message;
     return $messages;
   }
