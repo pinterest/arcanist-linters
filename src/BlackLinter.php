@@ -60,9 +60,9 @@ final class BlackLinter extends ArcanistExternalLinter {
     if ($err == 123 or $stderr) {
       return false;
     }
-    $flags = $this->getCommandFlags();
-    // Remove --check flag since instructions to user should be to fix lint errors 
-    unset($flags[array_search('--check', $flags)]);
+
+    // Remove lint-only flags since instructions to user should be to fix lint errors.
+    $flags = array_diff($this->getCommandFlags(), array('--check', '--quiet'));
 
     $message = new ArcanistLintMessage();
     $message->setPath($path);
