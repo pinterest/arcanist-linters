@@ -67,8 +67,13 @@ final class BlackLinter extends ArcanistExternalLinter {
   public function getLinterPriority() {
     return 0.01;
   }
+
   public function getDefaultBinary() {
     return 'black';
+  }
+
+  protected function getMandatoryFlags() {
+    return array('--quiet', '--check');
   }
 
   private function checkVersion($version, $compare_to) {
@@ -123,8 +128,8 @@ final class BlackLinter extends ArcanistExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
-    if ($err == 123 or $stderr) {
-      return false;
+    if ($err == 0) {
+      return array();
     }
 
     // Remove lint-only flags since instructions to user should be to fix lint errors.
