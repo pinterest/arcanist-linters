@@ -20,6 +20,9 @@
  */
 final class BlackLinter extends ArcanistExternalLinter {
 
+  private $pythonVersion = null;
+  private $skipLinting = false;
+
   public function getInfoName() {
     return 'Black';
   }
@@ -29,7 +32,7 @@ final class BlackLinter extends ArcanistExternalLinter {
   }
 
   public function getInfoDescription() {
-    return pht('Black is an opionionated code formatter for Python');
+    return pht('Black is an opinionated code formatter for Python');
   }
 
   public function getLinterName() {
@@ -40,6 +43,27 @@ final class BlackLinter extends ArcanistExternalLinter {
     return 'black';
   }
 
+  public function getLinterConfigurationOptions() {
+    $options = array(
+      'black.python' => array(
+        'type' => 'optional string',
+        'help' => pht('Python version requirement.'),
+      ),
+    );
+
+    return $options + parent::getLinterConfigurationOptions();
+  }
+
+  public function setLinterConfigurationValue($key, $value) {
+    switch ($key) {
+      case 'black.python':
+        $this->pythonVersion = $value;
+        return;
+    }
+
+    return parent::setLinterConfigurationValue($key, $value);
+  }
+
   public function getLinterPriority() {
     return 0.01;
   }
@@ -47,13 +71,55 @@ final class BlackLinter extends ArcanistExternalLinter {
     return 'black';
   }
 
+  private function checkVersion($version, $compare_to) {
+    $operator = '==';
+
+    $matches = null;
+    if (preg_match('/^([<>]=?|=)\s*(.*)$/', $compare_to, $matches)) {
+      $operator = $matches[1];
+      $compare_to = $matches[2];
+      if ($operator === '=') {
+        $operator = '==';
+      }
+    }
+
+    return version_compare($version, $compare_to, $operator);
+  }
+
+  private function getPythonVersion($cmd) {
+    list($err, $stdout, $stderr) = exec_manual('%C --version', $cmd);
+    return trim(str_replace('Python', '', $stdout));
+  }
+
   public function getVersion() {
+    if (!empty($this->pythonVersion)) {
+      $foundVersion = $this->getPythonVersion('python3');
+      if (!$this->checkVersion($foundVersion, $this->pythonVersion)) {
+        $this->skipLinting = true;
+        $message = pht(
+          "Skipping %s (requires Python version %s but `python3 --version` returned '%s')",
+          $this->getLinterConfigurationName(),
+          $this->pythonVersion,
+          $foundVersion);
+        fwrite(STDERR, phutil_console_format(
+          "<bg:yellow>** %s **</bg> %s\n",
+          "WARNING",
+          $message));
+      }
+    }
+
     list($err, $stdout, $stderr) = exec_manual('%C --version', $this->getExecutableCommand());
     return trim(str_replace('black, version', '', $stdout));
   }
 
   public function getInstallInstructions() {
     return pht('pip3 install black');
+  }
+
+  public function willLintPaths(array $paths) {
+    if (!$this->skipLinting) {
+      return parent::willLintPaths($paths);
+    }
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
