@@ -44,6 +44,10 @@ final class PythonIsortLinter extends ArcanistExternalLinter {
     return 'isort';
   }
 
+  public function getLinterPriority() {
+    return 0.4;
+  }
+
   public function getDefaultBinary() {
     return 'isort';
   }
