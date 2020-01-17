@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2019 Pinterest, Inc.
+ * Copyright 2019-2020 Pinterest, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  */
 
 /**
- * Formats Python files using Black
+ * Formats Python files using Black.
  */
 final class BlackLinter extends ArcanistExternalLinter {
 
-  private $pythonVersion = null;
-  private $skipLinting = false;
+  const LINT_STYLE = 0;
+  const LINT_ERROR = 1;
 
   public function getInfoName() {
     return 'Black';
@@ -32,7 +32,7 @@ final class BlackLinter extends ArcanistExternalLinter {
   }
 
   public function getInfoDescription() {
-    return pht('Black is an opinionated code formatter for Python');
+    return pht('Black is an opinionated code formatter for Python.');
   }
 
   public function getLinterName() {
@@ -43,29 +43,8 @@ final class BlackLinter extends ArcanistExternalLinter {
     return 'black';
   }
 
-  public function getLinterConfigurationOptions() {
-    $options = array(
-      'black.python' => array(
-        'type' => 'optional string',
-        'help' => pht('Python version requirement.'),
-      ),
-    );
-
-    return $options + parent::getLinterConfigurationOptions();
-  }
-
-  public function setLinterConfigurationValue($key, $value) {
-    switch ($key) {
-      case 'black.python':
-        $this->pythonVersion = $value;
-        return;
-    }
-
-    return parent::setLinterConfigurationValue($key, $value);
-  }
-
   public function getLinterPriority() {
-    return 0.01;
+    return 0.5;
   }
 
   public function getDefaultBinary() {
@@ -73,75 +52,115 @@ final class BlackLinter extends ArcanistExternalLinter {
   }
 
   protected function getMandatoryFlags() {
-    return array('--quiet', '--check');
-  }
-
-  private function checkVersion($version, $compare_to) {
-    $operator = '==';
-
-    $matches = null;
-    if (preg_match('/^([<>]=?|=)\s*(.*)$/', $compare_to, $matches)) {
-      $operator = $matches[1];
-      $compare_to = $matches[2];
-      if ($operator === '=') {
-        $operator = '==';
-      }
-    }
-
-    return version_compare($version, $compare_to, $operator);
-  }
-
-  private function getPythonVersion($cmd) {
-    list($err, $stdout, $stderr) = exec_manual('%C --version', $cmd);
-    return trim(str_replace('Python', '', $stdout));
+    return array('--quiet', '--diff');
   }
 
   public function getVersion() {
-    if (!empty($this->pythonVersion)) {
-      $foundVersion = $this->getPythonVersion('python3');
-      if (!$this->checkVersion($foundVersion, $this->pythonVersion)) {
-        $this->skipLinting = true;
-        $message = pht(
-          "Skipping %s (requires Python version %s but `python3 --version` returned '%s')",
-          $this->getLinterConfigurationName(),
-          $this->pythonVersion,
-          $foundVersion);
-        fwrite(STDERR, phutil_console_format(
-          "<bg:yellow>** %s **</bg> %s\n",
-          "WARNING",
-          $message));
-      }
-    }
+    list($err, $stdout, $stderr) = exec_manual(
+      '%C --version', $this->getExecutableCommand());
 
-    list($err, $stdout, $stderr) = exec_manual('%C --version', $this->getExecutableCommand());
-    return trim(str_replace('black, version', '', $stdout));
+    $matches = array();
+    if (preg_match('/version (?P<version>[^\s]+)$/', $stderr, $matches)) {
+      $this->version = $matches['version'];
+      return $this->version;
+    } else {
+      return false;
+    }
   }
 
   public function getInstallInstructions() {
     return pht('pip3 install black');
   }
 
-  public function willLintPaths(array $paths) {
-    if (!$this->skipLinting) {
-      return parent::willLintPaths($paths);
-    }
+  public function getLintSeverityMap() {
+    return array(
+      self::LINT_STYLE => ArcanistLintSeverity::SEVERITY_AUTOFIX,
+      self::LINT_ERROR => ArcanistLintSeverity::SEVERITY_ERROR,
+    );
+  }
+
+  public function getLintNameMap() {
+    return array(
+      self::LINT_STYLE => pht('Black code style'),
+      self::LINT_ERROR => pht('Black formatting error'),
+    );
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
-    if ($err == 0) {
+    // A non-zero error code means an error occured.
+    if ($err != 0) {
+      $messages = array();
+      $lines = phutil_split_lines($stderr, false);
+
+      foreach ($lines as $line) {
+        if (preg_match('/^error: (?:.*?): (.*)/', $line, $matches)) {
+          $messages[] = id(new ArcanistLintMessage())
+            ->setPath($path)
+            ->setCode($this->getLintMessageFullCode(self::LINT_ERROR))
+            ->setSeverity($this->getLintMessageSeverity(self::LINT_ERROR))
+            ->setName($this->getLintMessageName(self::LINT_ERROR))
+            ->setDescription($matches[1]);
+        }
+      }
+
+      return $messages;
+    }
+
+    // No error code and no output means that the file is already formatted.
+    if (empty($stdout)) {
       return array();
     }
 
-    // Remove lint-only flags since instructions to user should be to fix lint errors.
-    $flags = array_diff($this->getCommandFlags(), array('--check', '--quiet'));
+    $messages = array();
+    $parser = new ArcanistDiffParser();
+    $changes = $parser->parseDiff($stdout);
 
-    $message = new ArcanistLintMessage();
-    $message->setPath($path);
-    $message->setCode($this->getLinterName());
-    $message->setName($this->getLinterName());
-    $message->setDescription("Please run `black ".join(" ", $flags)." ".$path."`\n");
-    $message->setSeverity(ArcanistLintSeverity::SEVERITY_ADVICE);
-    $messages[] = $message;
+    foreach ($changes as $change) {
+      foreach ($change->getHunks() as $hunk) {
+        $repl = array();
+        $orig = array();
+
+        $lines = phutil_split_lines($hunk->getCorpus(), false);
+        foreach ($lines as $line) {
+          if (empty($line)) {
+            continue;
+          }
+
+          $char = $line[0];
+          $rest = substr($line, 1);
+
+          switch ($char) {
+            case '-':
+              $orig[] = $rest;
+              break;
+
+            case '+':
+              $repl[] = $rest;
+              break;
+
+            case '~':
+              break;
+
+            case ' ':
+              $orig[] = $rest;
+              $repl[] = $rest;
+              break;
+          }
+        }
+
+        $messages[] = id(new ArcanistLintMessage())
+          ->setPath($path)
+          ->setLine($hunk->getOldOffset())
+          ->setChar(1)
+          ->setCode($this->getLintMessageFullCode(self::LINT_STYLE))
+          ->setSeverity($this->getLintMessageSeverity(self::LINT_STYLE))
+          ->setName($this->getLintMessageName(self::LINT_STYLE))
+          ->setOriginalText(join("\n", $orig))
+          ->setReplacementText(join("\n", $repl))
+          ->setBypassChangedLineFiltering(true);
+      }
+    }
+
     return $messages;
   }
 }
