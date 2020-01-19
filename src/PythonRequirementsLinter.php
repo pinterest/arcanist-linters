@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2016 Pinterest, Inc.
+ * Copyright 2016-2020 Pinterest, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ final class PythonRequirementsLinter extends ArcanistLinter {
 
   private function parseRequirement($line) {
     # PEP 508 (https://www.python.org/dev/peps/pep-0508/)
-    $regex = "/^(?P<name>[[:alnum:]][[:alnum:]-_.]*)".
+    $regex = "/^(?P<name>[[:alnum:]][[:alnum:]-_.]*(?:\[[[:alnum:]]+\])?)".
              "(?:\s*(?P<cmp>(~=|==|!=|<=|>=|<|>|===))\s*".
              "(?P<version>[[:alnum:]-_.*+!]+))?".
              "(?:\s*;\s*(?P<environment>[^#]*))?/";
