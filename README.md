@@ -72,11 +72,9 @@ to normalize the format of Python code.
 {
     "type": "black",
     "include": "(\\.py$)",
-    "flags": ["--check", "-S", "--line-length=132"]
+    "flags": ["-S", "--line-length=132"]
 }
 ```
-
-Note: It is recommended to place black before other linters
 
 ### Checkstyle
 
