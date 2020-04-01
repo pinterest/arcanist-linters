@@ -9,6 +9,7 @@ Pinterest.
 - [Checkstyle](#checkstyle)
 - [ESLint](#eslint)
 - [Flake8](#flake8)
+- [Flawfinder](#flawfinder)
 - [Go Vet](#go-vet)
 - [Prettier](#prettier)
 - [Prettier ESLint](#prettier-eslint)
@@ -118,6 +119,17 @@ checking required Python and extension versions.
         "assertive": "1.0.1",
         "naming": "0.7.0"
     }
+}
+```
+
+### Flawfinder
+
+Lints C/C++ source files using [flawfinder](https://dwheeler.com/flawfinder/).
+
+```json
+{
+    "type": "flawfinder",
+    "include": "(\\.(c|cc|cpp|h)$)"
 }
 ```
 
