@@ -22,7 +22,7 @@
  * This is an extended version of the stock ArcanistFlake8Linter that adds
  * support for checking required Python and extension versions.
  */
-final class Flake8Linter extends ArcanistExternalLinter {
+final class Flake8Linter extends PythonExternalLinter {
 
   private $installInstructions = null;
   private $pythonVersion = null;
@@ -83,7 +83,7 @@ final class Flake8Linter extends ArcanistExternalLinter {
     return parent::setLinterConfigurationValue($key, $value);
   }
 
-  public function getDefaultBinary() {
+  public function getPythonBinary() {
     return 'flake8';
   }
 

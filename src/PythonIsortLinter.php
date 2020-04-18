@@ -18,7 +18,7 @@
 /**
  * Lints Python imports using `isort`.
  */
-final class PythonIsortLinter extends ArcanistExternalLinter {
+final class PythonIsortLinter extends PythonExternalLinter {
 
   const LINT_STYLE = 1;
 
@@ -48,7 +48,7 @@ final class PythonIsortLinter extends ArcanistExternalLinter {
     return 0.4;
   }
 
-  public function getDefaultBinary() {
+  public function getPythonBinary() {
     return 'isort';
   }
 
