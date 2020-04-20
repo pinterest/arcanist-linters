@@ -18,7 +18,7 @@
 /**
  * Formats Python files using Black.
  */
-final class BlackLinter extends ArcanistExternalLinter {
+final class BlackLinter extends PythonExternalLinter {
 
   const LINT_STYLE = 0;
   const LINT_ERROR = 1;
@@ -47,7 +47,7 @@ final class BlackLinter extends ArcanistExternalLinter {
     return 0.5;
   }
 
-  public function getDefaultBinary() {
+  public function getPythonBinary() {
     return 'black';
   }
 
