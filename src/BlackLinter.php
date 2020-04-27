@@ -87,7 +87,7 @@ final class BlackLinter extends PythonExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
-    // A non-zero error code means an error occured.
+    // A non-zero error code means an error occurred.
     if ($err != 0) {
       $messages = array();
       $lines = phutil_split_lines($stderr, false);
