@@ -97,9 +97,17 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
 
   public function getLinterConfigurationOptions() {
     $options = array(
+      'prettier-eslint.config' => array(
+        'type' => 'optional string',
+        'help' => pht('Use configuration from this file or shareable config'),
+      ),
       'prettier-eslint.cwd' => array(
         'type' => 'optional string',
         'help' => pht('Specify a project sub-directory for both the local prettier-eslint-cli install and the sub-directory to lint within.'),
+      ),
+      'prettier-eslint.eslintConfig' => array(
+        'type' => 'optional string',
+        'help' => pht('Use to set path to the eslint config to use for eslint --fix'),
       ),
     );
     return $options + parent::getLinterConfigurationOptions();
@@ -107,8 +115,16 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
 
   public function setLinterConfigurationValue($key, $value) {
     switch ($key) {
+      case 'prettier-eslint.config':
+        $this->flags[] = '--config';
+        $this->flags[] = $value;
+        return;
       case 'prettier-eslint.cwd':
         $this->cwd = $value;
+        return;
+      case 'prettier-eslint.eslintConfig':
+        $this->flags[] = '--eslint-config-path';
+        $this->flags[] = $value;
         return;
     }
     return parent::setLinterConfigurationValue($key, $value);
