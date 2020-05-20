@@ -52,21 +52,36 @@ class PinterestPylintLinter extends PythonExternalLinter {
     return pht('Install pylint using `%s`.', 'pip install pylint');
   }
 
+  protected function getDefaultMessageSeverity($code) {
+    switch (substr($code, 0, 1)) {
+      case 'R':
+      case 'C':
+        return ArcanistLintSeverity::SEVERITY_ADVICE;
+      case 'W':
+        return ArcanistLintSeverity::SEVERITY_WARNING;
+      case 'E':
+      case 'F':
+        return ArcanistLintSeverity::SEVERITY_ERROR;
+      default:
+        return ArcanistLintSeverity::SEVERITY_DISABLED;
+    }
+  }
+
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
     $lines = phutil_split_lines($stdout, false);
 
     $messages = array();
     foreach ($lines as $line) {
-      $matches = explode(':', $line, 4);
+      $matches = explode(':', $line, 5);
 
-      if (count($matches) === 4) {
-        $message = new ArcanistLintMessage();
-        $message->setPath($path);
-        $message->setLine($matches[1]);
-        $message->setCode($this->getLinterName());
-        $message->setName($this->getLinterName());
-        $message->setDescription(trim($matches[3]));
-        $message->setSeverity(ArcanistLintSeverity::SEVERITY_ADVICE);
+      if (count($matches) === 5) {
+        $message = (new ArcanistLintMessage())
+          ->setPath($path)
+          ->setLine($matches[1])
+          ->setCode(trim($this->getLinterName()))
+          ->setName(trim($this->getLinterName()))
+          ->setDescription($matches[4])
+          ->setSeverity($this->getLintMessageSeverity(trim($matches[3])));
 
         $messages[] = $message;
       }
