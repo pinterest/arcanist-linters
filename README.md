@@ -196,6 +196,19 @@ Lints Python imports using [isort](https://github.com/timothycrosley/isort).
 }
 ```
 
+### Pylint
+
+Lints Python using [pylint](https://www.pylint.org/). Unlike the module that
+ships with Arcanist, this implementation works with recent release of Pylint
+and also supports virtual environments.
+
+```json
+{
+    "type": "pinterest-pylint",
+    "include": "(\\.py$)"
+}
+```
+
 ### Python Requirements
 
 Ensures Python package requirements in [requirements.txt files][req-txt] are
