@@ -84,7 +84,7 @@ class PinterestPylintLinter extends PythonExternalLinter {
         $message = (new ArcanistLintMessage())
           ->setPath($path)
           ->setLine($matches[1])
-          ->setCode(trim($this->getLinterName()))
+          ->setCode(trim($matches[3]))
           ->setName(trim($this->getLinterName()))
           ->setDescription($matches[4])
           ->setSeverity($this->getLintMessageSeverity(trim($matches[3])));
