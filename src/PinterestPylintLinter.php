@@ -68,6 +68,12 @@ class PinterestPylintLinter extends PythonExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
+    if ($err === 32) {
+      // According to `man pylint` the exit status of 32 means there was a
+      // usage error. That's bad, so actually exit abnormally.
+      return false;
+    }
+
     $lines = phutil_split_lines($stdout, false);
 
     $messages = array();
