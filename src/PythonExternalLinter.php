@@ -75,6 +75,14 @@ abstract class PythonExternalLinter extends ArcanistExternalLinter {
   }
 
   private function findVirtualenv($root) {
+    // If the shell environment has an activated virtualenv, defer to PATH.
+    // We could also extract this directory from the environment variable
+    // and add it to the front of our our search list below, but that might
+    // be more confusing than helpful in practice.
+    if (!empty(getenv('VIRTUAL_ENV'))) {
+      return null;
+    }
+
     foreach ($this->virtualenvs as $virtualenv) {
       $path = Filesystem::resolvePath($virtualenv, $root);
       if (is_dir($path)) {
