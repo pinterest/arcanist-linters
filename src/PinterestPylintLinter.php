@@ -16,11 +16,9 @@
  */
 
 /**
- * Base class for external Pylint-based linters.
+ * Lints Python source files using pylint.
  */
 class PinterestPylintLinter extends PythonExternalLinter {
-
-  private $virtualenvs = array('.venv');
 
   public function getPythonBinary() {
     return 'pylint';
@@ -43,7 +41,7 @@ class PinterestPylintLinter extends PythonExternalLinter {
   }
 
   public function getLinterName() {
-    return 'PINTEREST-PYLINT';
+    return 'PYLINT';
   }
 
   public function getLinterConfigurationName() {
@@ -51,7 +49,7 @@ class PinterestPylintLinter extends PythonExternalLinter {
   }
 
   public function getInstallInstructions() {
-    return pht('pip3 install --user pylint');
+    return pht('Install pylint using `%s`.', 'pip install pylint');
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {

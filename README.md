@@ -13,6 +13,7 @@ Pinterest.
 - [Go Vet](#go-vet)
 - [Prettier](#prettier)
 - [Prettier ESLint](#prettier-eslint)
+- [Pylint](#pylint)
 - [Python Imports](#python-imports)
 - [Python isort](#python-isort)
 - [Python Requirements](#python-requirements)
@@ -199,7 +200,7 @@ Lints Python imports using [isort](https://github.com/timothycrosley/isort).
 ### Pylint
 
 Lints Python using [pylint](https://www.pylint.org/). Unlike the module that
-ships with Arcanist, this implementation works with recent release of Pylint
+ships with Arcanist, this implementation works with recent releases of Pylint
 and also supports virtual environments.
 
 ```json
