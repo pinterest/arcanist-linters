@@ -166,11 +166,16 @@ final class ESLintLinter extends ArcanistExternalLinter {
         if (strpos($offense['message'], "File ignored ") === 0) {
           continue;
         }
-
+        
+        $ruleid = $offense['ruleId'];
+        if(!$ruleid){
+            $ruleid = 'unknown';
+        }
+        
         $message = new ArcanistLintMessage();
         $message->setPath($file['filePath']);
         $message->setSeverity($this->mapSeverity($offense['severity']));
-        $message->setName($offense['ruleId'] || 'unknown');
+        $message->setName($ruleid);
         $message->setDescription($offense['message']);
         $message->setLine($offense['line']);
         $message->setChar($offense['column']);
