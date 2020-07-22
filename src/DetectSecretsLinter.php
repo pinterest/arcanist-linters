@@ -49,31 +49,15 @@ final class DetectSecretsLinter extends PythonExternalLinter {
   }
 
   protected function getMandatoryFlags() {
-      return array('-v', 'scan');
+      return array('scan');
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
 
-      $lines = phutil_split_lines($stdout, false);
+      $json = json_decode($stdout, true);
+      $json_results = $json["results"];
 
       $messages = array();
-      $output_string = array();
-
-      foreach($lines as $result) {
-	 if ($result !== '') {
-             if (preg_match("/\bresults\b/i", $result)) {
-                 $initial = array_search($result, $lines);
-             }
-
-             if (preg_match("/\bversion\b/i", $result)) {
-                 $final = array_search($result, $lines);
-	     }
-	 }
-      }
-
-      for($i = $initial+1; $i < $final; $i += 1) {
-          $output_string[] = $lines[$i];    
-      }
 
       $error_message = "Looks like you are about to commit secrets to this repo. Please avoid this practice\n\n";
       $error_message .= "Possible mitigations:\n";
@@ -81,15 +65,20 @@ final class DetectSecretsLinter extends PythonExternalLinter {
       $error_message .= "2. If secret has already been committed please rotate that secret. If rotation is taking significant time then please contact #security_related slack channel\n";
       $error_message .= "3. If its a test file with secrets (not belonging to any prod service) mark false positives with an inline `pragma: allowlist secret` comment\n";
 
-      if (!empty($output_string)) {
-          $message = new ArcanistLintMessage();
-          $message->setPath($path);
-          $message->setCode($this->getLinterName());
-          $message->setName($this->getLinterName());
-          $message->setDescription($error_message."\n".implode("\n", $output_string));
-          $message->setSeverity(ArcanistLintSeverity::SEVERITY_ERROR);
+      if (count($json_results)) {
+          foreach ($json_results as $result) {
+              foreach ($result as $output) {
+		  $message = new ArcanistLintMessage();
+                  $message->setPath($path);
+                  $message->setCode($this->getLinterName());
+		  $message->setName($this->getLinterName());
+		  $message->setLine($output["line_number"]);
+		  $message->setDescription($error_message."\n".json_encode($output, true));
+		  $message->setSeverity(ArcanistLintSeverity::SEVERITY_ERROR);
 
-          $messages[] = $message;
+		  $messages[] = $message;
+	      }
+	  }
       }
 
       return $messages;
