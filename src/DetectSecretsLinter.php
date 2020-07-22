@@ -41,7 +41,7 @@ final class DetectSecretsLinter extends PythonExternalLinter {
   }
 
   public function getPythonBinary() {
-	  return 'detect-secrets';
+    return 'detect-secrets';
   }
 
   public function getInstallInstructions() {
@@ -65,20 +65,20 @@ final class DetectSecretsLinter extends PythonExternalLinter {
       $error_message .= "2. If secret has already been committed please rotate that secret. If rotation is taking significant time then please contact #security_related slack channel\n";
       $error_message .= "3. If its a test file with secrets (not belonging to any prod service) mark false positives with an inline `pragma: allowlist secret` comment\n";
 
-      if (count($json_results)) {
+      if (!empty($json_results)) {
           foreach ($json_results as $result) {
               foreach ($result as $output) {
-		  $message = new ArcanistLintMessage();
+                  $message = new ArcanistLintMessage();
                   $message->setPath($path);
                   $message->setCode($this->getLinterName());
-		  $message->setName($this->getLinterName());
-		  $message->setLine($output["line_number"]);
-		  $message->setDescription($error_message."\n".json_encode($output, true));
-		  $message->setSeverity(ArcanistLintSeverity::SEVERITY_ERROR);
+                  $message->setName($this->getLinterName());
+                  $message->setLine($output["line_number"]);
+                  $message->setDescription($error_message."\n".json_encode($output, true));
+                  $message->setSeverity(ArcanistLintSeverity::SEVERITY_ERROR);
 
-		  $messages[] = $message;
-	      }
-	  }
+                  $messages[] = $message;
+              }
+          }
       }
 
       return $messages;
