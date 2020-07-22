@@ -18,7 +18,7 @@
 /**
  * Detect secrets in code base. 
  */
-final class DetectSecretsLinter extends ArcanistExternalLinter {
+final class DetectSecretsLinter extends PythonExternalLinter {
 
   public function getInfoName() {
       return 'detect-secrets'; 
@@ -29,7 +29,7 @@ final class DetectSecretsLinter extends ArcanistExternalLinter {
   }
 
   public function getInfoDescription() {
-      return 'Detect secrets within code base during compile time';
+      return 'Detect potential secrets in files to prevent accidental commit';
   }
 
   public function getLinterName() {
@@ -40,7 +40,7 @@ final class DetectSecretsLinter extends ArcanistExternalLinter {
       return 'detect-secrets';
   }
 
-  public function getDefaultBinary() {
+  public function getPythonBinary() {
 	  return 'detect-secrets';
   }
 
@@ -57,29 +57,22 @@ final class DetectSecretsLinter extends ArcanistExternalLinter {
       $lines = phutil_split_lines($stdout, false);
 
       $messages = array();
-      $linter_results = array();
-
-      foreach($lines as $line) {
-         if ($line !== '') {
-            $linter_results[] = $line;
-         }
-      }
-
-      $results_keyword = "results";
-      $version_keyword = "version";
-      foreach($linter_results as $result) {
-         if (preg_match("/\b$results_keyword\b/i", $result)) {
-             $initial = array_search($result, $linter_results);
-         }
-
-         if (preg_match("/\b$version_keyword\b/i", $result)) {
-             $final = array_search($result, $linter_results);
-         }
-      }
-
       $output_string = array();
+
+      foreach($lines as $result) {
+	 if ($result !== '') {
+             if (preg_match("/\bresults\b/i", $result)) {
+                 $initial = array_search($result, $lines);
+             }
+
+             if (preg_match("/\bversion\b/i", $result)) {
+                 $final = array_search($result, $lines);
+	     }
+	 }
+      }
+
       for($i = $initial+1; $i < $final; $i += 1) {
-         $output_string[] = $linter_results[$i];    
+          $output_string[] = $lines[$i];    
       }
 
       $error_message = "Looks like you are about to commit secrets to this repo. Please avoid this practice\n\n";

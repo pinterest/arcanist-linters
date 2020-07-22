@@ -32,7 +32,7 @@ phutil_register_library_map(array(
     'ApacheThriftLinter' => 'ArcanistExternalLinter',
     'BlackLinter' => 'PythonExternalLinter',
     'CheckstyleLinter' => 'ArcanistExternalLinter',
-    'DetectSecretsLinter' => 'ArcanistExternalLinter',
+    'DetectSecretsLinter' => 'PythonExternalLinter',
     'ESLintLinter' => 'ArcanistExternalLinter',
     'Flake8Linter' => 'PythonExternalLinter',
     'FlawfinderLinter' => 'ArcanistExternalLinter',
