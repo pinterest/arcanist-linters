@@ -20,6 +20,8 @@
  */
 final class DetectSecretsLinter extends PythonExternalLinter {
 
+  private $message = "";
+
   public function getInfoName() {
       return 'detect-secrets'; 
   }
@@ -40,6 +42,27 @@ final class DetectSecretsLinter extends PythonExternalLinter {
       return 'detect-secrets';
   }
 
+  public function getLinterConfigurationOptions() {
+      $options = array(
+       'detect-secrets.message' => array(
+         'type' => 'optional string',
+         'help' => $this->message,
+      ),
+    );
+
+    return $options + parent::getLinterConfigurationOptions();
+  }
+
+  public function setLinterConfigurationValue($key, $value) {
+      switch ($key) {
+          case 'detect-secrets.message':
+              $this->message = $value;
+              return;
+      }
+
+      return parent::setLinterConfigurationValue($key, $value);
+  }
+
   public function getPythonBinary() {
     return 'detect-secrets';
   }
@@ -58,12 +81,7 @@ final class DetectSecretsLinter extends PythonExternalLinter {
       $json_results = $json["results"];
 
       $messages = array();
-
-      $error_message = "Looks like you are about to commit secrets to this repo. Please avoid this practice\n\n";
-      $error_message .= "Possible mitigations:\n";
-      $error_message .= "1. For information about putting your secrets in a safer place, please refer pinch/knox \n";
-      $error_message .= "2. If secret has already been committed please rotate that secret. If rotation is taking significant time then please contact #security_related slack channel\n";
-      $error_message .= "3. If its a test file with secrets (not belonging to any prod service) mark false positives with an inline `pragma: allowlist secret` comment\n";
+      $error_message = "Potential secrets detected in code";
 
       if (!empty($json_results)) {
           foreach ($json_results as $result) {
@@ -73,7 +91,8 @@ final class DetectSecretsLinter extends PythonExternalLinter {
                   $message->setCode($this->getLinterName());
                   $message->setName($this->getLinterName());
                   $message->setLine($output["line_number"]);
-                  $message->setDescription($error_message."\n".json_encode($output, true));
+                  $linter_config = $this->getLinterConfigurationOptions();
+                  $message->setDescription($error_message."\n".json_encode($linter_config['detect-secrets.message']['help'], true));
                   $message->setSeverity(ArcanistLintSeverity::SEVERITY_ERROR);
 
                   $messages[] = $message;
