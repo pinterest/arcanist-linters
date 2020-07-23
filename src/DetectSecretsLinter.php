@@ -91,8 +91,7 @@ final class DetectSecretsLinter extends PythonExternalLinter {
                   $message->setCode($this->getLinterName());
                   $message->setName($this->getLinterName());
                   $message->setLine($output["line_number"]);
-                  $linter_config = $this->getLinterConfigurationOptions();
-                  $message->setDescription($error_message."\n".json_encode($linter_config['detect-secrets.message']['help'], true));
+                  $message->setDescription($error_message."\n".$this->message, true);
                   $message->setSeverity(ArcanistLintSeverity::SEVERITY_ERROR);
 
                   $messages[] = $message;
