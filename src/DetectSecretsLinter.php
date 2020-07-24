@@ -76,7 +76,6 @@ final class DetectSecretsLinter extends PythonExternalLinter {
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
-
       $json = json_decode($stdout, true);
       $json_results = $json["results"];
 
