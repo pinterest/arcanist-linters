@@ -46,7 +46,7 @@ final class DetectSecretsLinter extends PythonExternalLinter {
       $options = array(
        'detect-secrets.message' => array(
          'type' => 'optional string',
-         'help' => $this->message,
+         'help' => pht("Detects potential secrets/passwords in code files"),
       ),
     );
 
@@ -91,7 +91,7 @@ final class DetectSecretsLinter extends PythonExternalLinter {
                   $message->setCode($this->getLinterName());
                   $message->setName($this->getLinterName());
                   $message->setLine($output["line_number"]);
-                  $message->setDescription($error_message."\n".$this->message, true);
+                  $message->setDescription($error_message."\n".$this->message);
                   $message->setSeverity(ArcanistLintSeverity::SEVERITY_ERROR);
 
                   $messages[] = $message;
