@@ -46,7 +46,7 @@ final class DetectSecretsLinter extends PythonExternalLinter {
       $options = array(
        'detect-secrets.message' => array(
          'type' => 'optional string',
-         'help' => pht("Detects potential secrets/passwords in code files"),
+         'help' => pht("Error message used when a secret is detected"),
       ),
     );
 
