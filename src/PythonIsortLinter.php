@@ -67,7 +67,7 @@ final class PythonIsortLinter extends PythonExternalLinter {
   }
 
   public function getInstallInstructions() {
-    return pht('Install isort using `pip install isort`.');
+    return pht('Install isort using `pip3 install isort`.');
   }
 
   protected function getMandatoryFlags() {
