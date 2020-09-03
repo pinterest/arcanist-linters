@@ -58,7 +58,7 @@ final class PythonIsortLinter extends PythonExternalLinter {
       $this->getExecutableCommand());
 
     $matches = array();
-    if (preg_match('/^(?P<version>\d+\.\d+\.\d+)$/', $stderr, $matches)) {
+    if (preg_match('/^(?P<version>\d+\.\d+\.\d+)$/', $stdout, $matches)) {
       $this->version = $matches['version'];
       return $this->version;
     } else {
@@ -89,13 +89,17 @@ final class PythonIsortLinter extends PythonExternalLinter {
         return array();
     }
 
-    // Expected output includes a single header optionally followed by a
-    // multiline diff. We're only interested in the latter case (which implies
-    // a lint violation), but we could also parse the header for more detailed
-    // information if we need that later.
-    list($header, $diff) = explode("\n", $stdout, 2);
-    if (empty($diff)) {
+    if (version_compare($this->version, '5.5.0', '>=')) {
+      $diff = $stdout;
+    } else {
+      // Expected output includes a single header optionally followed by a
+      // multiline diff. We're only interested in the latter case (which implies
+      // a lint violation), but we could also parse the header for more detailed
+      // information if we need that later.
+      list($header, $diff) = explode("\n", $stdout, 2);
+      if (empty($diff)) {
         return array();
+      }
     }
 
     $messages = array();
