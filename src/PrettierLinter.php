@@ -18,9 +18,7 @@
 /**
  * Lints JavaScript and JSX files using Prettier
  */
-final class PrettierLinter extends ArcanistExternalLinter {
-  private $cwd = '';
-
+final class PrettierLinter extends NodeExternalLinter {
   public function getInfoName() {
     return 'Prettier';
   }
@@ -41,62 +39,13 @@ final class PrettierLinter extends ArcanistExternalLinter {
     return 'prettier';
   }
 
-  public function getDefaultBinary() {
-    if ($this->cwd) {
-      $realCWD = Filesystem::resolvePath($this->cwd, $this->getProjectRoot());
-      list($err, $stdout, $stderr) = exec_manual('yarn -s --cwd %s bin prettier', $realCWD);
-      if ($stdout) {
-        return strtok($stdout, "\n");
-      }
-    } else {
-      $localBinaryPath = Filesystem::resolvePath('./node_modules/.bin/prettier');
-
-      if (Filesystem::binaryExists($localBinaryPath)) {
-        return $localBinaryPath;
-      }
-    }
-
-    // Fallback on global install & fallthrough to internal existence checks
+  public function getNodeBinary() {
     return 'prettier';
   }
 
   public function getVersion() {
     list($err, $stdout, $stderr) = exec_manual('%C -v', $this->getExecutableCommand());
     return $stdout;
-  }
-
-  public function getLinterConfigurationOptions() {
-    $options = array(
-      'prettier.cwd' => array(
-        'type' => 'optional string',
-        'help' => pht('Specify a project sub-directory for both the local prettier install and the sub-directory to lint within.'),
-      ),
-    );
-    return $options + parent::getLinterConfigurationOptions();
-  }
-
-  public function setLinterConfigurationValue($key, $value) {
-    switch ($key) {
-      case 'prettier.cwd':
-        $this->cwd = $value;
-        return;
-    }
-    return parent::setLinterConfigurationValue($key, $value);
-  }
-
-  public function getInstallInstructions() {
-    return pht(
-      "\n\t%s[%s globally] run: `%s`\n\t[%s locally] run either: `%s` OR `%s`",
-      $this->cwd ? pht("[%s globally] (required for %s) run: `%s`\n\t",
-        'yarn',
-        '--cwd',
-        'npm install --global yarn@1') : '',
-      'prettier',
-      'npm install --global prettier',
-      'prettier',
-      'npm install --save-dev prettier',
-      'yarn add --dev prettier'
-    );
   }
 
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
