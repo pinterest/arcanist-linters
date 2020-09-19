@@ -11,6 +11,7 @@ Pinterest.
 - [Flake8](#flake8)
 - [Flawfinder](#flawfinder)
 - [Go Vet](#go-vet)
+- [GraphQL Schema Linter](#graphql-schema-linter)
 - [Prettier](#prettier)
 - [Prettier ESLint](#prettier-eslint)
 - [Pylint](#pylint)
@@ -131,6 +132,35 @@ Lints C/C++ source files using [flawfinder](https://dwheeler.com/flawfinder/).
 {
     "type": "flawfinder",
     "include": "(\\.(c|cc|cpp|h)$)"
+}
+```
+
+### GraphQL Schema Linter
+
+Lint GraphQL Schema Definition Language (SDL) using [graphql-schema-linter](https://github.com/cjoudrey/graphql-schema-linter).
+
+```json
+{
+    "type": "graphql-schema",
+    "include": "(\\.(graphql|gql)$)",
+    "graphql-schema.rules": [
+        "fields-have-descriptions",
+        "types-have-descriptions"
+    ],
+    "graphql-schema.config": "config",
+    "graphql-schema.custom-rules": [
+        "config/custom-rules/*.js",
+        "vendor/extra-graphql-rules/*.js"
+    ],
+    "graphql-schema.ignore": {
+        "fields-have-descriptions": [
+            "Obvious",
+            "Query.obvious",
+            "Query.something.obvious"
+        ]
+    },
+    "graphql-schema.comment-descriptions": false,
+    "graphql-schema.old-implements-syntax": false
 }
 ```
 
