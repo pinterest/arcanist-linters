@@ -18,8 +18,7 @@
 /**
  * Lints JavaScript and JSX files using Prettier & Eslint auto-fix
  */
-final class PrettierESLintLinter extends ArcanistExternalLinter {
-  private $cwd = '';
+final class PrettierESLintLinter extends NodeExternalLinter {
   private $flags = array();
 
   public function getInfoName() {
@@ -46,6 +45,10 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
     return true;
   }
 
+  public function getNodeBinary() {
+    return 'prettier-eslint';
+  }
+
   public function getDefaultInterpreter() {
     list($err, $stdout, $stderr) = exec_manual('node -v');
     preg_match('/^v([^\.]+)\..*$/', $stdout, $m);
@@ -65,25 +68,6 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
     return 'node';
   }
 
-  public function getDefaultBinary() {
-    if ($this->cwd) {
-      $realCWD = Filesystem::resolvePath($this->cwd, $this->getProjectRoot());
-      list($err, $stdout, $stderr) = exec_manual('yarn -s --cwd %s bin prettier-eslint', $realCWD);
-      if ($stdout) {
-        return strtok($stdout, "\n");
-      }
-    } else {
-      $localBinaryPath = Filesystem::resolvePath('./node_modules/.bin/prettier-eslint');
-
-      if (Filesystem::binaryExists($localBinaryPath)) {
-        return $localBinaryPath;
-      }
-    }
-
-    // Fallback on global install & fallthrough to internal existence checks
-    return 'prettier-eslint';
-  }
-
   public function getVersion() {
     list($err, $stdout, $stderr) = exec_manual('%C -v', $this->getExecutableCommand());
     return $stdout;
@@ -92,40 +76,6 @@ final class PrettierESLintLinter extends ArcanistExternalLinter {
   protected function getMandatoryFlags() {
     return array(
       '--log-level=silent',
-    );
-  }
-
-  public function getLinterConfigurationOptions() {
-    $options = array(
-      'prettier-eslint.cwd' => array(
-        'type' => 'optional string',
-        'help' => pht('Specify a project sub-directory for both the local prettier-eslint-cli install and the sub-directory to lint within.'),
-      ),
-    );
-    return $options + parent::getLinterConfigurationOptions();
-  }
-
-  public function setLinterConfigurationValue($key, $value) {
-    switch ($key) {
-      case 'prettier-eslint.cwd':
-        $this->cwd = $value;
-        return;
-    }
-    return parent::setLinterConfigurationValue($key, $value);
-  }
-
-  public function getInstallInstructions() {
-    return pht(
-      "\n\t%s[%s globally] run: `%s`\n\t[%s locally] run either: `%s` OR `%s`",
-      $this->cwd ? pht("[%s globally] (required for %s) run: `%s`\n\t",
-        'yarn',
-        '--cwd',
-        'npm install --global yarn@1') : '',
-      'prettier-eslint',
-      'npm install --global prettier-eslint',
-      'prettier-eslint',
-      'npm install --save-dev prettier-eslint',
-      'yarn add --dev prettier-eslint'
     );
   }
 
