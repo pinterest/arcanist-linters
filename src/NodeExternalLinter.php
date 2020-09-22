@@ -102,7 +102,7 @@ abstract class NodeExternalLinter extends ArcanistExternalLinter {
       }
     }
 
-    if ($path) {
+    if (isset($path) && $path) {
       $binaryPath = $path.DIRECTORY_SEPARATOR.$bin;
       if (Filesystem::binaryExists($binaryPath)) {
         return $binaryPath;
