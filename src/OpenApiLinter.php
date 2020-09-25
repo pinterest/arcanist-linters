@@ -74,6 +74,10 @@ final class OpenApiLinter extends NodeExternalLinter {
     return parent::setLinterConfigurationValue($key, $value);
   }
 
+  protected function canCustomizeLintSeverities() {
+    return false;
+  }
+
   public function getNodeBinary() {
     return 'lint-openapi';
   }
@@ -142,13 +146,13 @@ final class OpenApiLinter extends NodeExternalLinter {
     return $messages;
   }
 
-  protected function processOutput($path, $outputCategories, $severity) {
+  private function processOutput($path, $output_categories, $severity) {
     $messages = array();
-    foreach ($outputCategories as $outputCategory) {
-      foreach ($outputCategory as $output) {
+    foreach ($output_categories as $output_category) {
+      foreach ($output_category as $output) {
         $message = new ArcanistLintMessage();
         $message->setPath($path)
-          ->setCode(is_array($output['path']) ? implode('.', $output['path']) : $output['path'])
+          ->setCode($this->getLinterName())
           ->setName($this->getLinterName())
           ->setLine($output['line'])
           ->setDescription($output['message'])
