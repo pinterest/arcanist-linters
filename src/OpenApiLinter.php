@@ -96,54 +96,48 @@ final class OpenApiLinter extends NodeExternalLinter {
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
     $messages = array();
 
-    switch($err) {
-      case 0:
-        /* Sample Output
-        {
-          "errors": {
-            "spectral": [
-              {
-                "path": [
-                  "servers",
-                  "0",
-                  "url"
-                ],
-                "message": "Server URL should not have a trailing slash.",
-                "line": 9
-              },
-            ]
+    if ($err) {
+      throw new Exception(pht("While reading %s, an error occurred:\n%s", $path, $stderr));
+    }
+    /* Sample Output
+    {
+      "errors": {
+        "spectral": [
+          {
+            "path": [
+              "servers",
+              "0",
+              "url"
+            ],
+            "message": "Server URL should not have a trailing slash.",
+            "line": 9
           },
-          "warnings": {
-            "spectral": [
-              {
-                "path": [],
-                "message": "OpenAPI object should have non-empty `tags` array.",
-                "line": 0
-              }
-             ]
-          },
-          "error": true,
-          "warning": true
-        }
-        */
-        $json = json_decode($stdout, true);
-        if (!is_array($json)) {
-          throw new Exception(pht("While reading %s, an error occurred:\n%s", $path, $stderr));
-        }
-        if (array_key_exists('errors', $json)) {
-          $errors = $json['errors'];
-          $messages = $this->processOutput($path, $errors, ArcanistLintSeverity::SEVERITY_ERROR);
-        }
-        if (array_key_exists('warnings', $json)) {
-          $warnings = $json['warnings'];
-          $messages += $this->processOutput($path, $warnings, ArcanistLintSeverity::SEVERITY_WARNING);
-        }
-        break;
-      default:
-        if ($stderr) {
-          throw new Exception(pht("While reading %s, an error occurred:\n%s", $path, $stderr));
-        }
-        break;
+        ]
+      },
+      "warnings": {
+        "spectral": [
+          {
+            "path": [],
+            "message": "OpenAPI object should have non-empty `tags` array.",
+            "line": 0
+          }
+         ]
+      },
+      "error": true,
+      "warning": true
+    }
+    */
+    $json = json_decode($stdout, true);
+    if (!is_array($json)) {
+      throw new Exception(pht("While reading %s, an error occurred:\n%s", $path, $stderr));
+    }
+    if (array_key_exists('errors', $json)) {
+      $errors = $json['errors'];
+      $messages = $this->processOutput($path, $errors, ArcanistLintSeverity::SEVERITY_ERROR);
+    }
+    if (array_key_exists('warnings', $json)) {
+      $warnings = $json['warnings'];
+      $messages += $this->processOutput($path, $warnings, ArcanistLintSeverity::SEVERITY_WARNING);
     }
     return $messages;
   }
