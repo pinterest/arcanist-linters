@@ -172,7 +172,14 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
         }
         */
 
+        if (strlen($stdout) == 65536) {
+          // We've exceeded the stdout buffer and this will not successfully json_decode()
+          throw new Exception(pht("%s returned too much output. Run the linter manually with:\n%s %s", $this->getLinterName(), $this->getExecutableCommand(), $this->getActivePath()));
+        }
         $json = json_decode($stdout, true);
+        if (json_last_error()) {
+          throw new JsonException(pht("\nUnable to decode result from %s: %s\n\nOutput was:\n%s", $this->getLinterName(), json_last_error_msg(), $stdout));
+        }
         $errors = $json['errors'];
 
         foreach ($errors as $error) {
