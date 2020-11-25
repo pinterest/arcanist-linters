@@ -68,6 +68,10 @@ abstract class NodeExternalLinter extends ArcanistExternalLinter {
     return parent::setLinterConfigurationValue($key, $value);
   }
 
+  public function getNpmPackageName() {
+    return $this->getNodeBinary();
+  }
+
   public function getInstallInstructions() {
     return pht(
       "\n\t%s[%s globally] run: `%s`\n\t[%s locally] run either: `%s` OR `%s`",
@@ -76,10 +80,10 @@ abstract class NodeExternalLinter extends ArcanistExternalLinter {
         '--cwd',
         'npm install --global yarn@1') : '',
       $this->getNodeBinary(),
-      'npm install --global '.$this->getNodeBinary(),
+      'npm install --global '.$this->getNpmPackageName(),
       $this->getNodeBinary(),
-      'npm install --save-dev '.$this->getNodeBinary(),
-      'yarn add --dev '.$this->getNodeBinary()
+      'npm install --save-dev '.$this->getNpmPackageName(),
+      'yarn add --dev '.$this->getNpmPackageName()
     );
   }
 

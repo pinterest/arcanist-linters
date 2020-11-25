@@ -82,6 +82,10 @@ final class OpenApiLinter extends NodeExternalLinter {
     return 'lint-openapi';
   }
 
+  public function getNpmPackageName() {
+    return 'ibm-openapi-validator';
+  }
+
   protected function getMandatoryFlags() {
     return array('--json');
   }
