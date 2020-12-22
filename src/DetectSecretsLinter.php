@@ -16,14 +16,14 @@
  */
 
 /**
- * Detect secrets in code base. 
+ * Detect secrets in code base.
  */
 final class DetectSecretsLinter extends PythonExternalLinter {
 
   private $message = "";
 
   public function getInfoName() {
-      return 'detect-secrets'; 
+      return 'detect-secrets';
   }
 
   public function getInfoURI() {
@@ -65,10 +65,6 @@ final class DetectSecretsLinter extends PythonExternalLinter {
 
   public function getPythonBinary() {
     return 'detect-secrets';
-  }
-
-  public function getInstallInstructions() {
-      return pht('pip3 install detect-secrets');
   }
 
   protected function getMandatoryFlags() {

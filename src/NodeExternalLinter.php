@@ -20,6 +20,7 @@
  */
 abstract class NodeExternalLinter extends ArcanistExternalLinter {
   private $cwd = '';
+  protected $customInstallInstructions = null;
 
   /**
    * Return the name of the external Node-based linter.
@@ -48,12 +49,19 @@ abstract class NodeExternalLinter extends ArcanistExternalLinter {
 
   public function getLinterConfigurationOptions() {
     $options = array(
+      'install-instructions' => array(
+        'type' => 'optional string',
+        'help' => pht(
+          'Specify custom instructions that should be used to install %s',
+          $this->getNodeBinary()
+        ),
+      ),
       $this->getLinterConfigurationName().'.cwd' => array(
         'type' => 'optional string',
         'help' => pht(
-            'Specify a project sub-directory for both the local %s install and the sub-directory to lint within.',
-            $this->getNodeBinary()
-          ),
+          'Specify a project sub-directory for both the local %s install and the sub-directory to lint within.',
+          $this->getNodeBinary()
+        ),
       ),
     );
     return $options + parent::getLinterConfigurationOptions();
@@ -61,6 +69,9 @@ abstract class NodeExternalLinter extends ArcanistExternalLinter {
 
   public function setLinterConfigurationValue($key, $value) {
     switch ($key) {
+      case 'install-instructions':
+        $this->customInstallInstructions = $value;
+        return;
       case $this->getLinterConfigurationName().'.cwd':
         $this->cwd = $value;
         return;
@@ -73,6 +84,13 @@ abstract class NodeExternalLinter extends ArcanistExternalLinter {
   }
 
   public function getInstallInstructions() {
+    if ($this->customInstallInstructions) {
+      return pht(
+        "\n\t[%s] run: `%s`",
+        $this->getNodeBinary(),
+        $this->customInstallInstructions,
+      );
+    }
     return pht(
       "\n\t%s[%s globally] run: `%s`\n\t[%s locally] run either: `%s` OR `%s`",
       $this->cwd ? pht("[%s globally] (required for %s) run: `%s`\n\t",

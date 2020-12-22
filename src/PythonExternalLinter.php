@@ -21,6 +21,7 @@
 abstract class PythonExternalLinter extends ArcanistExternalLinter {
 
   private $virtualenvs = array('.venv');
+  protected $customInstallInstructions = null;
 
   /**
    * Return the name of the external Python-based linter.
@@ -34,8 +35,19 @@ abstract class PythonExternalLinter extends ArcanistExternalLinter {
    */
   abstract public function getPythonBinary();
 
+  public function getPipPackageName() {
+    return $this->getPythonBinary();
+  }
+
   public function getLinterConfigurationOptions() {
     $options = array(
+      'install-instructions' => array(
+        'type' => 'optional string',
+        'help' => pht(
+          'Specify custom instructions that should be used to install %s',
+          $this->getPythonBinary()
+        ),
+      ),
       'python.virtualenvs' => array(
         'type' => 'optional list<string>',
         'help' => pht('Python virtualenv paths.'),
@@ -47,6 +59,9 @@ abstract class PythonExternalLinter extends ArcanistExternalLinter {
 
   public function setLinterConfigurationValue($key, $value) {
     switch ($key) {
+      case 'install-instructions':
+        $this->customInstallInstructions = $value;
+        return;
       case 'python.virtualenvs':
         $this->virtualenvs = $value;
         return;
@@ -59,6 +74,13 @@ abstract class PythonExternalLinter extends ArcanistExternalLinter {
     return $this->resolveBinaryPath(
       $this->getPythonBinary(),
       $this->getProjectRoot());
+  }
+
+  public function getInstallInstructions() {
+    if ($this->customInstallInstructions) {
+      return pht('Install %s using `%s`.', $this->getPythonBinary(), $this->customInstallInstructions);
+    }
+    return pht('Install %s using `pip install %s`.', $this->getPythonBinary(), $this->getPipPackageName());
   }
 
   final protected function resolveBinaryPath($bin, $root) {
