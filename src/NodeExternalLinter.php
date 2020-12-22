@@ -88,7 +88,7 @@ abstract class NodeExternalLinter extends ArcanistExternalLinter {
       return pht(
         "\n\t[%s] run: `%s`",
         $this->getNodeBinary(),
-        $this->customInstallInstructions,
+        $this->customInstallInstructions
       );
     }
     return pht(
