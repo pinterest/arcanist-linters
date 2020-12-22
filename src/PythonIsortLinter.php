@@ -66,10 +66,6 @@ final class PythonIsortLinter extends PythonExternalLinter {
     }
   }
 
-  public function getInstallInstructions() {
-    return pht('Install isort using `pip3 install isort`.');
-  }
-
   protected function getMandatoryFlags() {
     $flags = array('--quiet', '--check-only', '--diff');
     if (version_compare($this->version, '4.3.18', '>=')) {

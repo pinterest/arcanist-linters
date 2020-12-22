@@ -48,10 +48,6 @@ class PinterestPylintLinter extends PythonExternalLinter {
     return 'pinterest-pylint';
   }
 
-  public function getInstallInstructions() {
-    return pht('Install pylint using `%s`.', 'pip install pylint');
-  }
-
   protected function getDefaultMessageSeverity($code) {
     switch (substr($code, 0, 1)) {
       case 'R':

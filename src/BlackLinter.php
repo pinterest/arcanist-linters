@@ -67,10 +67,6 @@ final class BlackLinter extends PythonExternalLinter {
     }
   }
 
-  public function getInstallInstructions() {
-    return pht('pip3 install black');
-  }
-
   public function getLintSeverityMap() {
     return array(
       self::LINT_STYLE => ArcanistLintSeverity::SEVERITY_AUTOFIX,

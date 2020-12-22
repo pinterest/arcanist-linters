@@ -169,7 +169,7 @@ final class Flake8Linter extends PythonExternalLinter {
     if ($this->installInstructions) {
       return $this->installInstructions;
     }
-    return pht('Install flake8 using `%s`.', 'pip install flake8');
+    return parent::getInstallInstructions();
   }
 
   public function getUpgradeInstructions() {
