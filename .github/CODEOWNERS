@@ -1,2 +1,6 @@
 # Global
 * @jparise
+
+# API Schema Linters
+src/GraphQLSchemaLinter.php @steverice
+src/OpenApiLinter.php @steverice
