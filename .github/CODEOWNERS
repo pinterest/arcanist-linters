@@ -4,3 +4,7 @@
 # API Schema Linters
 src/GraphQLSchemaLinter.php @steverice
 src/OpenApiLinter.php @steverice
+
+# Python Type Checkers
+src/PyrightLinter.php @steverice
+
