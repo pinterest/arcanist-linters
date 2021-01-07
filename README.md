@@ -16,6 +16,7 @@ Pinterest.
 - [Prettier](#prettier)
 - [Prettier ESLint](#prettier-eslint)
 - [Pylint](#pylint)
+- [Pyright](#pyright)
 - [Python Imports](#python-imports)
 - [Python isort](#python-isort)
 - [Python Requirements](#python-requirements)
@@ -251,6 +252,18 @@ and also supports virtual environments.
 ```json
 {
     "type": "pinterest-pylint",
+    "include": "(\\.py$)"
+}
+```
+
+### Pyright
+
+Type-checks Python code using [Pyright](https://github.com/microsoft/pyright).
+
+
+```json
+{
+    "type": "pyright",
     "include": "(\\.py$)"
 }
 ```
