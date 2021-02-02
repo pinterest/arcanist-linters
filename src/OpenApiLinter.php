@@ -24,7 +24,7 @@ final class OpenApiLinter extends NodeExternalLinter {
   private $errors_only = false;
 
   public function getInfoName() {
-    return 'OpenAPI spec linter';
+    return 'OpenAPI Validator';
   }
 
   public function getInfoURI() {
@@ -36,7 +36,7 @@ final class OpenApiLinter extends NodeExternalLinter {
   }
 
   public function getLinterName() {
-    return 'OpenAPI Spec Linter';
+    return 'OPENAPI';
   }
 
   public function getLinterConfigurationName() {
@@ -44,8 +44,8 @@ final class OpenApiLinter extends NodeExternalLinter {
   }
 
   public function getVersion() {
-    list($err, $stdout, $stderr) = exec_manual('%C -v', $this->getExecutableCommand());
-    return $stdout;
+    list($err, $stdout, $stderr) = exec_manual('%C --version', $this->getExecutableCommand());
+    return trim($stdout);
   }
 
   public function getLinterConfigurationOptions() {
@@ -87,7 +87,7 @@ final class OpenApiLinter extends NodeExternalLinter {
   }
 
   protected function getMandatoryFlags() {
-    return array('--json');
+    return array('--json', '--verbose');
   }
 
   protected function getDefaultFlags() {
@@ -118,6 +118,7 @@ final class OpenApiLinter extends NodeExternalLinter {
               "url"
             ],
             "message": "Server URL should not have a trailing slash.",
+            "rule": "operation_id_naming_convention",
             "line": 9
           },
         ]
@@ -127,6 +128,7 @@ final class OpenApiLinter extends NodeExternalLinter {
           {
             "path": [],
             "message": "OpenAPI object should have non-empty `tags` array.",
+            "rule": "operation_id_naming_convention",
             "line": 0
           }
          ]
@@ -156,7 +158,7 @@ final class OpenApiLinter extends NodeExternalLinter {
       foreach ($output_category as $output) {
         $message = new ArcanistLintMessage();
         $message->setPath($path)
-          ->setCode($this->getLinterName())
+          ->setCode(nonempty(idx($output, 'rule'), 'unknown'))
           ->setName($this->getLinterName())
           ->setLine($output['line'])
           ->setDescription($output['message'])
