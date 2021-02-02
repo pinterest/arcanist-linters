@@ -12,7 +12,7 @@ Pinterest.
 - [Flawfinder](#flawfinder)
 - [Go Vet](#go-vet)
 - [GraphQL Schema Linter](#graphql-schema-linter)
-- [OpenAPI Spec Linter](#openapi-spec-linter)
+- [OpenAPI Validator](#openapi-validator)
 - [Prettier](#prettier)
 - [Prettier ESLint](#prettier-eslint)
 - [Pylint](#pylint)
@@ -178,12 +178,16 @@ code constructs.
 }
 ```
 
-### OpenAPI Spec Linter
+### OpenAPI Validator
 
 Lint OpenAPI specifications using [openapi-validator](https://github.com/IBM/openapi-validator).
+
+_(Supports openapi-validator version 0.34.1 and later.)_
+
 ```json
 {
     "type": "openapi-spec",
+    "version": ">=0.34.1",
     "openapi-spec.config": ".validaterc",
     "openapi-spec.errors_only": true,
     "include": [
