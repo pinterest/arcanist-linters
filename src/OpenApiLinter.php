@@ -21,6 +21,7 @@
 final class OpenApiLinter extends NodeExternalLinter {
 
   private $config = null;
+  private $debug = false;
   private $errors_only = false;
 
   public function getInfoName() {
@@ -54,6 +55,10 @@ final class OpenApiLinter extends NodeExternalLinter {
         'type' => 'optional string',
         'help' => pht('Config file that defines the validation rules (https://github.com/IBM/openapi-validator#configuration-file)'),
       ),
+      'openapi-spec.debug' => array(
+        'type' => 'optional bool',
+        'help' => pht('Enable debugging output'),
+      ),
       'openapi-spec.errors_only' => array(
         'type' => 'optional bool',
         'help' => pht('Only print the errors, ignore the warnings'),
@@ -66,6 +71,9 @@ final class OpenApiLinter extends NodeExternalLinter {
     switch ($key) {
       case 'openapi-spec.config':
         $this->config = $value;
+        return;
+      case 'openapi-spec.debug':
+        $this->debug = $value;
         return;
       case 'openapi-spec.errors_only':
         $this->errors_only = $value;
@@ -87,13 +95,16 @@ final class OpenApiLinter extends NodeExternalLinter {
   }
 
   protected function getMandatoryFlags() {
-    return array('--json', '--verbose');
+    return array('--json', '--verbose', '--no_colors');
   }
 
   protected function getDefaultFlags() {
     $flags = array();
     if ($this->config) {
       $flags[] = '--config='.$this->config;
+    }
+    if ($this->debug) {
+      $flags[] = '--debug';
     }
     if ($this->errors_only) {
       $flags[] = '--errors_only';
@@ -105,7 +116,7 @@ final class OpenApiLinter extends NodeExternalLinter {
     $messages = array();
 
     if ($err) {
-      throw new Exception(pht("While reading %s, an error occurred:\n%s", $path, $stderr));
+      throw new Exception(pht("While reading %s, an error occurred:\n%s\n%s", $path, $stderr, $stdout));
     }
     /* Sample Output
     {
