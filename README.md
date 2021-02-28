@@ -189,6 +189,7 @@ _(Supports openapi-validator version 0.34.1 and later.)_
     "type": "openapi-spec",
     "version": ">=0.34.1",
     "openapi-spec.config": ".validaterc",
+    "openapi-spec.debug": false,
     "openapi-spec.errors_only": true,
     "include": [
         "(\\.yaml$)"
