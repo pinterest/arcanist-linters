@@ -62,7 +62,7 @@ final class PythonRequirementsLinter extends ArcanistLinter {
 
   private function parseRequirement($line) {
     # PEP 508 (https://www.python.org/dev/peps/pep-0508/)
-    $regex = "/^(?P<name>[[:alnum:]][[:alnum:]\-_.]*(?:\[[[:alnum:]]+\])?)".
+    $regex = "/^(?P<name>[[:alnum:]][[:alnum:]\-_.]*(?:\[[[:alnum:],]+\])?)".
              "(?:\s*(?P<cmp>(~=|==|!=|<=|>=|<|>|===))\s*".
              "(?P<version>[[:alnum:]\-_.*+!]+))?".
              "(?:\s*;\s*(?P<environment>[^#]*))?/";
