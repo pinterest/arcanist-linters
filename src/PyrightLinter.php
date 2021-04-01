@@ -154,8 +154,8 @@ final class PyrightLinter extends NodeExternalLinter {
           $message->setPath($path)
             ->setCode(substr($rule, 0, 128))
             ->setName($this->getLinterName())
-            ->setLine($error['range']['start']['line'])
-            ->setChar($error['range']['start']['character'])
+            ->setLine($error['range']['start']['line'] + 1)
+            ->setChar($error['range']['start']['character'] + 1)
             ->setDescription($error['message'])
             ->setSeverity($this->mapSeverity($error['severity']));
           $messages[] = $message;
