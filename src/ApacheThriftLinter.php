@@ -22,6 +22,7 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
 
   private $generators = array();
   private $includes = array();
+  private $installInstructions = null;
   private $tmpdir = null;
 
   public function getInfoName() {
@@ -54,6 +55,10 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
         'type' => 'optional list<string>',
         'help' => pht('List of directories searched for include directives.'),
       ),
+      'thrift.install' => array(
+        'type' => 'optional string',
+        'help' => pht('Installation instructions.'),
+      ),
     );
 
     return $options + parent::getLinterConfigurationOptions();
@@ -69,6 +74,9 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
         return;
       case 'thrift.includes':
         $this->includes = $value;
+        return;
+      case 'thrift.install':
+        $this->installInstructions = $value;
         return;
     }
 
@@ -93,6 +101,9 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
   }
 
   public function getInstallInstructions() {
+    if ($this->installInstructions) {
+      return $this->installInstructions;
+    }
     return pht(
       'Install thrift using `%s` (macOS) or `%s` (Linux).',
       'brew install thrift',
