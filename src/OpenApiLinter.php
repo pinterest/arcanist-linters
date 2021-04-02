@@ -121,28 +121,20 @@ final class OpenApiLinter extends NodeExternalLinter {
     /* Sample Output
     {
       "errors": {
-        "spectral": [
-          {
-            "path": [
-              "servers",
-              "0",
-              "url"
-            ],
-            "message": "Server URL should not have a trailing slash.",
-            "rule": "operation_id_naming_convention",
-            "line": 9
-          },
-        ]
+        "path": [
+          "servers",
+          "0",
+          "url"
+        ],
+        "message": "Server URL should not have a trailing slash.",
+        "rule": "operation_id_naming_convention",
+        "line": 9
       },
       "warnings": {
-        "spectral": [
-          {
-            "path": [],
-            "message": "OpenAPI object should have non-empty `tags` array.",
-            "rule": "operation_id_naming_convention",
-            "line": 0
-          }
-         ]
+        "path": [],
+        "message": "OpenAPI object should have non-empty `tags` array.",
+        "rule": "operation_id_naming_convention",
+        "line": 0
       },
       "error": true,
       "warning": true
@@ -163,19 +155,17 @@ final class OpenApiLinter extends NodeExternalLinter {
     return $messages;
   }
 
-  private function processOutput($path, $output_categories, $severity) {
+  private function processOutput($path, $output_category, $severity) {
     $messages = array();
-    foreach ($output_categories as $output_category) {
-      foreach ($output_category as $output) {
-        $message = new ArcanistLintMessage();
-        $message->setPath($path)
-          ->setCode(nonempty(idx($output, 'rule'), 'unknown'))
-          ->setName($this->getLinterName())
-          ->setLine($output['line'])
-          ->setDescription($output['message'])
-          ->setSeverity($severity);
-        $messages[] = $message;
-      }
+    foreach ($output_category as $output) {
+      $message = new ArcanistLintMessage();
+      $message->setPath($path)
+        ->setCode(nonempty(idx($output, 'rule'), 'unknown'))
+        ->setName($this->getLinterName())
+        ->setLine($output['line'])
+        ->setDescription($output['message'])
+        ->setSeverity($severity);
+      $messages[] = $message;
     }
     return $messages;
   }
