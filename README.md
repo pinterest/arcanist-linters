@@ -182,12 +182,12 @@ code constructs.
 
 Lint OpenAPI specifications using [openapi-validator](https://github.com/IBM/openapi-validator).
 
-_(Supports openapi-validator version 0.34.1 and later.)_
+_(Supports openapi-validator version 0.36.0 and later.)_
 
 ```json
 {
     "type": "openapi-spec",
-    "version": ">=0.34.1",
+    "version": ">=0.36.0",
     "openapi-spec.config": ".validaterc",
     "openapi-spec.debug": false,
     "openapi-spec.errors_only": true,
