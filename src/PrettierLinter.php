@@ -43,11 +43,6 @@ final class PrettierLinter extends NodeExternalLinter {
     return 'prettier';
   }
 
-  public function getVersion() {
-    list($err, $stdout, $stderr) = exec_manual('%C -v', $this->getExecutableCommand());
-    return $stdout;
-  }
-
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
     if ($err) {
       return false;

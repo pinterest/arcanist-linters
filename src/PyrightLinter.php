@@ -42,7 +42,13 @@ final class PyrightLinter extends NodeExternalLinter {
 
   public function getVersion() {
     list($err, $stdout, $stderr) = exec_manual('%C --version', $this->getExecutableCommand());
-    return str_replace('pyright ', '', $stdout);
+
+    $matches = array();
+    if (preg_match('/^pyright (\d\.\d\.\d)$/', $stdout, $matches)) {
+      return $matches[1];
+    } else {
+      return false;
+    }
   }
 
   public function getLinterConfigurationOptions() {

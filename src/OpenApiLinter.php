@@ -44,11 +44,6 @@ final class OpenApiLinter extends NodeExternalLinter {
     return 'openapi-spec';
   }
 
-  public function getVersion() {
-    list($err, $stdout, $stderr) = exec_manual('%C --version', $this->getExecutableCommand());
-    return trim($stdout);
-  }
-
   public function getLinterConfigurationOptions() {
     $options = array(
       'openapi-spec.config' => array(

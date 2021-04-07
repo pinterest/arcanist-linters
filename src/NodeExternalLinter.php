@@ -18,9 +18,8 @@
 /**
  * Base class for external Node-based linters.
  */
-abstract class NodeExternalLinter extends ArcanistExternalLinter {
+abstract class NodeExternalLinter extends PinterestExternalLinter {
   private $cwd = '';
-  protected $customInstallInstructions = null;
 
   /**
    * Return the name of the external Node-based linter.
@@ -49,13 +48,6 @@ abstract class NodeExternalLinter extends ArcanistExternalLinter {
 
   public function getLinterConfigurationOptions() {
     $options = array(
-      'install-instructions' => array(
-        'type' => 'optional string',
-        'help' => pht(
-          'Specify custom instructions that should be used to install %s',
-          $this->getNodeBinary()
-        ),
-      ),
       $this->getLinterConfigurationName().'.cwd' => array(
         'type' => 'optional string',
         'help' => pht(
@@ -69,9 +61,6 @@ abstract class NodeExternalLinter extends ArcanistExternalLinter {
 
   public function setLinterConfigurationValue($key, $value) {
     switch ($key) {
-      case 'install-instructions':
-        $this->customInstallInstructions = $value;
-        return;
       case $this->getLinterConfigurationName().'.cwd':
         $this->cwd = $value;
         return;
@@ -83,13 +72,22 @@ abstract class NodeExternalLinter extends ArcanistExternalLinter {
     return $this->getNodeBinary();
   }
 
+  public function getVersion() {
+    // Many node packages follow this same convention
+    list($err, $stdout, $stderr) = exec_manual('%C --version', $this->getExecutableCommand());
+
+    $matches = array();
+    if (preg_match('/^(\d\.\d\.\d)$/', $stdout, $matches)) {
+      return $matches[1];
+    } else {
+      return false;
+    }
+  }
+
   public function getInstallInstructions() {
-    if ($this->customInstallInstructions) {
-      return pht(
-        "\n\t[%s] run: `%s`",
-        $this->getNodeBinary(),
-        $this->customInstallInstructions
-      );
+    $instructions = parent::getInstallInstructions();
+    if (!empty($instructions)) {
+      return $instructions;
     }
     return pht(
       "\n\t%s[%s globally] run: `%s`\n\t[%s locally] run either: `%s` OR `%s`",

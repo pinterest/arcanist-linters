@@ -49,11 +49,6 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
     return 'graphql-schema';
   }
 
-  public function getVersion() {
-    list($err, $stdout, $stderr) = exec_manual('%C --version', $this->getExecutableCommand());
-    return $stdout;
-  }
-
   public function getLinterConfigurationOptions() {
     $options = array(
       'graphql-schema.rules' => array(

@@ -18,7 +18,7 @@
 /**
  * Lints C/C++ source files using flawfinder.
  */
-final class FlawfinderLinter extends ArcanistExternalLinter {
+final class FlawfinderLinter extends PinterestExternalLinter {
 
   public function getInfoName() {
     return 'Flawfinder';

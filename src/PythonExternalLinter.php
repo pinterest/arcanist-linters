@@ -18,10 +18,9 @@
 /**
  * Base class for external Python-based linters.
  */
-abstract class PythonExternalLinter extends ArcanistExternalLinter {
+abstract class PythonExternalLinter extends PinterestExternalLinter {
 
   private $virtualenvs = array('.venv');
-  protected $customInstallInstructions = null;
 
   /**
    * Return the name of the external Python-based linter.
@@ -41,13 +40,6 @@ abstract class PythonExternalLinter extends ArcanistExternalLinter {
 
   public function getLinterConfigurationOptions() {
     $options = array(
-      'install-instructions' => array(
-        'type' => 'optional string',
-        'help' => pht(
-          'Specify custom instructions that should be used to install %s',
-          $this->getPythonBinary()
-        ),
-      ),
       'python.virtualenvs' => array(
         'type' => 'optional list<string>',
         'help' => pht('Python virtualenv paths.'),
@@ -59,9 +51,6 @@ abstract class PythonExternalLinter extends ArcanistExternalLinter {
 
   public function setLinterConfigurationValue($key, $value) {
     switch ($key) {
-      case 'install-instructions':
-        $this->customInstallInstructions = $value;
-        return;
       case 'python.virtualenvs':
         $this->virtualenvs = $value;
         return;
@@ -77,8 +66,9 @@ abstract class PythonExternalLinter extends ArcanistExternalLinter {
   }
 
   public function getInstallInstructions() {
-    if ($this->customInstallInstructions) {
-      return pht('Install %s using `%s`.', $this->getPythonBinary(), $this->customInstallInstructions);
+    $instructions = parent::getInstallInstructions();
+    if (!empty($instructions)) {
+      return $instructions;
     }
     return pht('Install %s using `pip install %s`.', $this->getPythonBinary(), $this->getPipPackageName());
   }

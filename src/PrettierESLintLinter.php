@@ -49,6 +49,10 @@ final class PrettierESLintLinter extends NodeExternalLinter {
     return 'prettier-eslint';
   }
 
+  public function getNpmPackageName() {
+    return 'prettier-eslint-cli';
+  }
+
   public function getDefaultInterpreter() {
     list($err, $stdout, $stderr) = exec_manual('node -v');
     preg_match('/^v([^\.]+)\..*$/', $stdout, $m);
@@ -66,11 +70,6 @@ final class PrettierESLintLinter extends NodeExternalLinter {
       return __DIR__ . '/node4_proxy';
     }
     return 'node';
-  }
-
-  public function getVersion() {
-    list($err, $stdout, $stderr) = exec_manual('%C -v', $this->getExecutableCommand());
-    return $stdout;
   }
 
   protected function getMandatoryFlags() {

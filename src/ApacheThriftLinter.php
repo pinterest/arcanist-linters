@@ -18,7 +18,7 @@
 /**
  * Lints Apache Thrift IDL files using the "thrift" compiler.
  */
-final class ApacheThriftLinter extends ArcanistExternalLinter {
+final class ApacheThriftLinter extends PinterestExternalLinter {
 
   private $generators = array();
   private $includes = array();
@@ -101,8 +101,9 @@ final class ApacheThriftLinter extends ArcanistExternalLinter {
   }
 
   public function getInstallInstructions() {
-    if ($this->installInstructions) {
-      return $this->installInstructions;
+    $instructions = nonempty($this->installInstructions, parent::getInstallInstructions());
+    if (!empty($instructions)) {
+      return $instructions;
     }
     return pht(
       'Install thrift using `%s` (macOS) or `%s` (Linux).',
