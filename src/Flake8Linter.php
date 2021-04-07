@@ -172,10 +172,6 @@ final class Flake8Linter extends PythonExternalLinter {
     return parent::getInstallInstructions();
   }
 
-  public function getUpgradeInstructions() {
-    return $this->getInstallInstructions();
-  }
-
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
     $lines = phutil_split_lines($stdout, false);
 

@@ -18,7 +18,7 @@
 /**
  * Lints Java source files using the "checkstyle" tool.
  */
-final class CheckstyleLinter extends ArcanistExternalLinter {
+final class CheckstyleLinter extends PinterestExternalLinter {
 
   private $config = null;
 

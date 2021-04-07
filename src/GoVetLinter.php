@@ -18,7 +18,7 @@
 /**
  * Uses the Go vet command to lint for suspicious code constructs.
  */
-final class GoVetLinter extends ArcanistExternalLinter {
+final class GoVetLinter extends PinterestExternalLinter {
 
   public function getInfoName() {
     return 'Vet';
