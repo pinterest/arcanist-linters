@@ -151,7 +151,7 @@ final class PyrightLinter extends NodeExternalLinter {
         */
 
         $json = json_decode($stdout, true);
-        $errors = isset($json['generalDiagnostics']) ? $json['generalDiagnostics'] : $json['diagnostics'];
+        $errors = idx($json, 'generalDiagnostics', idx($json, 'diagnostics'));
 
         foreach ($errors as $error) {
           $rule = $error['rule'];
