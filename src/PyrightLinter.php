@@ -111,17 +111,17 @@ final class PyrightLinter extends NodeExternalLinter {
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
     $messages = array();
 
-    // https://github.com/microsoft/pyright/blob/e372c6572ffe3d1d005e46383a390ed2b0b4acb8/docs/command-line.md#pyright-exit-codes
+    // https://github.com/microsoft/pyright/blob/1ac0b5fa095fbea8e5bcb27308e0f680592268ee/docs/command-line.md#pyright-exit-codes
     switch($err) {
       case 0: // No errors reported
         break;
       case 1: // One or more errors reported
         /* JSON Structure
-        https://github.com/microsoft/pyright/blob/e372c6572ffe3d1d005e46383a390ed2b0b4acb8/docs/command-line.md#json-output
+        https://github.com/microsoft/pyright/blob/1ac0b5fa095fbea8e5bcb27308e0f680592268ee/docs/command-line.md#json-output
         {
           version: string,
           time: string,
-          diagnostics: Diagnostic[],
+          generalDiagnostics: Diagnostic[],
           summary: {
             filesAnalyzed: number,
             errorCount: number,
@@ -130,7 +130,7 @@ final class PyrightLinter extends NodeExternalLinter {
             timeInSec: number
           }
         }
-        
+
         Diagnostic:
         {
           file: string,
@@ -151,7 +151,7 @@ final class PyrightLinter extends NodeExternalLinter {
         */
 
         $json = json_decode($stdout, true);
-        $errors = $json['diagnostics'];
+        $errors = idx($json, 'generalDiagnostics', idx($json, 'diagnostics'));
 
         foreach ($errors as $error) {
           $rule = $error['rule'];
