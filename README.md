@@ -20,6 +20,7 @@ Pinterest.
 - [Python Imports](#python-imports)
 - [Python isort](#python-isort)
 - [Python Requirements](#python-requirements)
+- [Spectral](#spectral)
 
 We also welcome additional [contributions](CONTRIBUTING.md).
 
@@ -265,7 +266,6 @@ and also supports virtual environments.
 
 Type-checks Python code using [Pyright](https://github.com/microsoft/pyright).
 
-
 ```json
 {
     "type": "pyright",
@@ -292,6 +292,17 @@ six>=1.10.0  # noqa: allow any recent version of six
 ```
 
 [req-txt]: https://pip.readthedocs.org/en/latest/user_guide/#requirements-files
+
+### Spectral
+
+Lints OpenAPI documents using [Spectral](https://stoplight.io/spectral).
+
+```json
+{
+    "type": "spectral",
+    "include": "(openapi.yaml)"
+}
+```
 
 ## Installation
 
