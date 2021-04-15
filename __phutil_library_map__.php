@@ -30,6 +30,7 @@ phutil_register_library_map(array(
     'PythonImportsLinter' => 'src/PythonImportsLinter.php',
     'PythonIsortLinter' => 'src/PythonIsortLinter.php',
     'PythonRequirementsLinter' => 'src/PythonRequirementsLinter.php',
+    'SpectralLinter' => 'src/SpectralLinter.php',
   ),
   'function' => array(),
   'xmap' => array(
@@ -41,7 +42,7 @@ phutil_register_library_map(array(
     'ESLintLinter' => 'NodeExternalLinter',
     'Flake8Linter' => 'PythonExternalLinter',
     'FlawfinderLinter' => 'PinterestExternalLinter',
-    'GoVetLinter' => 'ArcanistExternalLinter',
+    'GoVetLinter' => 'PinterestExternalLinter',
     'GraphQLSchemaLinter' => 'NodeExternalLinter',
     'NodeExternalLinter' => 'PinterestExternalLinter',
     'OpenApiLinter' => 'NodeExternalLinter',
@@ -54,5 +55,6 @@ phutil_register_library_map(array(
     'PythonImportsLinter' => 'ArcanistLinter',
     'PythonIsortLinter' => 'PythonExternalLinter',
     'PythonRequirementsLinter' => 'ArcanistLinter',
+    'SpectralLinter' => 'NodeExternalLinter',
   ),
 ));
