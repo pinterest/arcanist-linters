@@ -300,7 +300,8 @@ Lints OpenAPI documents using [Spectral](https://stoplight.io/spectral).
 ```json
 {
     "type": "spectral",
-    "include": "(openapi.yaml)"
+    "include": "(openapi.yaml)",
+    "spectral.ruleset": ".spectral.yml",
 }
 ```
 

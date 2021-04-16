@@ -20,6 +20,8 @@
  */
 final class SpectralLinter extends NodeExternalLinter {
 
+  private $ruleset = null;
+
   public function getInfoName() {
     return 'Spectral';
   }
@@ -45,8 +47,23 @@ final class SpectralLinter extends NodeExternalLinter {
     return trim($stdout);
   }
 
-  protected function canCustomizeLintSeverities() {
-    return false;
+  public function getLinterConfigurationOptions() {
+    $options = array(
+      'spectral.ruleset' => array(
+        'type' => 'optional string',
+        'help' => pht('Path/URL to a ruleset file'),
+      ),
+    );
+    return $options + parent::getLinterConfigurationOptions();
+  }
+
+  public function setLinterConfigurationValue($key, $value) {
+    switch ($key) {
+      case 'spectral.ruleset':
+        $this->ruleset = $value;
+        return;
+    }
+    return parent::setLinterConfigurationValue($key, $value);
   }
 
   public function getNodeBinary() {
@@ -58,7 +75,18 @@ final class SpectralLinter extends NodeExternalLinter {
   }
 
   protected function getMandatoryFlags() {
-    return array('lint', '--format', 'json', '--quiet');
+    $flags = array('lint', '--format', 'json', '--quiet');
+
+    if ($this->ruleset) {
+      $flags[] = '--ruleset';
+      $flags[] = $this->ruleset;
+    }
+
+    return $flags;
+  }
+
+  protected function getDefaultFlags() {
+    return array('--ignore-unknown-format');
   }
 
   public function shouldExpectCommandErrors() {
@@ -69,6 +97,8 @@ final class SpectralLinter extends NodeExternalLinter {
     return array(
       0 => ArcanistLintSeverity::SEVERITY_ERROR,
       1 => ArcanistLintSeverity::SEVERITY_WARNING,
+      2 => ArcanistLintSeverity::SEVERITY_ADVICE,
+      3 => ArcanistLintSeverity::SEVERITY_ADVICE,
     );
   }
 
