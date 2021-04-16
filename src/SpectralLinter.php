@@ -125,7 +125,7 @@ final class SpectralLinter extends NodeExternalLinter {
               "character": 30
             }
           },
-          "source": "/Users/jon/P/pinboard/api/v5/spec/core/schemas.yaml"
+          "source": "/api/core/schemas.yaml"
         }
       ]
     */
@@ -133,13 +133,19 @@ final class SpectralLinter extends NodeExternalLinter {
 
     $messages = array();
     foreach ($json as $item) {
+      $description = $item['message'];
+      if (array_key_exists('path', $item)) {
+        $path = implode('.', $item['path']);
+        $description.=" ($path)";
+      }
+
       $messages[] = id(new ArcanistLintMessage())
         ->setName($this->getLinterName())
         ->setCode($item['code'])
         ->setPath(idx($item, 'source', $path))
         ->setLine($item['range']['start']['line'] + 1)
         ->setChar($item['range']['start']['character'] + 1)
-        ->setDescription($item['message'])
+        ->setDescription($description)
         ->setSeverity($this->getLintMessageSeverity($item['severity']));
     }
 
