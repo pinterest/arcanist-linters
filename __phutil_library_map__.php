@@ -31,6 +31,7 @@ phutil_register_library_map(array(
     'PythonIsortLinter' => 'src/PythonIsortLinter.php',
     'PythonRequirementsLinter' => 'src/PythonRequirementsLinter.php',
     'SpectralLinter' => 'src/SpectralLinter.php',
+    'ThriftCheckLinter' => 'src/ThriftCheckLinter.php',
   ),
   'function' => array(),
   'xmap' => array(
@@ -56,5 +57,6 @@ phutil_register_library_map(array(
     'PythonIsortLinter' => 'PythonExternalLinter',
     'PythonRequirementsLinter' => 'ArcanistLinter',
     'SpectralLinter' => 'NodeExternalLinter',
+    'ThriftCheckLinter' => 'PinterestExternalLinter',
   ),
 ));

@@ -21,6 +21,7 @@ Pinterest.
 - [Python isort](#python-isort)
 - [Python Requirements](#python-requirements)
 - [Spectral](#spectral)
+- [ThriftCheck](#thriftcheck)
 
 We also welcome additional [contributions](CONTRIBUTING.md).
 
@@ -302,6 +303,22 @@ Lints OpenAPI documents using [Spectral](https://stoplight.io/spectral).
     "type": "spectral",
     "include": "(openapi.yaml)",
     "spectral.ruleset": ".spectral.yml",
+}
+```
+
+### ThriftCheck
+
+Lints Thrift IDL files using [ThriftCheck](https://github.com/pinterest/thriftcheck).
+
+```json
+{
+    "type": "thriftcheck",
+    "include": "(\\.thrift$)",
+    "thriftcheck.config": ".thriftcheck.toml",
+    "thriftcheck.includes": [
+        ".",
+        "common"
+    ]
 }
 ```
 
