@@ -23,6 +23,7 @@ final class OpenApiLinter extends NodeExternalLinter {
   private $config = null;
   private $debug = false;
   private $errors_only = false;
+  private $linter_name = 'OPENAPI';
 
   public function getInfoName() {
     return 'OpenAPI Validator';
@@ -37,7 +38,11 @@ final class OpenApiLinter extends NodeExternalLinter {
   }
 
   public function getLinterName() {
-    return 'OPENAPI';
+    return $this->linter_name;
+  }
+
+  public function setLinterName($value) {
+    $this->linter_name = $value;
   }
 
   public function getLinterConfigurationName() {
@@ -154,11 +159,13 @@ final class OpenApiLinter extends NodeExternalLinter {
     $messages = array();
     foreach ($output_category as $output) {
       $message = new ArcanistLintMessage();
+      $data = $output[0];
+      $this->setLinterName(implode('/', $data['path']));
       $message->setPath($path)
-        ->setCode(nonempty(idx($output, 'rule'), 'unknown'))
+        ->setCode(nonempty(idx($data, 'rule'), 'unknown'))
         ->setName($this->getLinterName())
-        ->setLine($output['line'])
-        ->setDescription($output['message'])
+        ->setLine($data['line'])
+        ->setDescription($data['message'])
         ->setSeverity($severity);
       $messages[] = $message;
     }
