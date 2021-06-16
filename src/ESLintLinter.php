@@ -67,6 +67,10 @@ final class ESLintLinter extends NodeExternalLinter {
   }
 
   protected function getDefaultFlags() {
+    if ($this->cwd) {
+      $this->flags[] = '--resolve-plugins-relative-to';
+      $this->flags[] = $this->cwd;
+    }
     return $this->flags;
   }
 
@@ -84,10 +88,6 @@ final class ESLintLinter extends NodeExternalLinter {
         'type' => 'optional bool',
         'help' => pht('Specify whether eslint should autofix issues. (https://eslint.org/docs/user-guide/command-line-interface#fixing-problems)'),
       ),
-      'eslint.cwd' => array(
-        'type' => 'optional string',
-        'help' => pht('Directory eslint should resolve plugins relative to. (https://eslint.org/docs/user-guide/command-line-interface#--resolve-plugins-relative-to)'),
-      ),
     );
     return $options + parent::getLinterConfigurationOptions();
   }
@@ -99,17 +99,13 @@ final class ESLintLinter extends NodeExternalLinter {
         $this->flags[] = $value;
         return;
       case 'eslint.env':
-        $this->flags[] = '--env ';
+        $this->flags[] = '--env';
         $this->flags[] = $value;
         return;
       case 'eslint.fix':
         if ($value) {
-          $this->flags[] = '--fix ';
+          $this->flags[] = '--fix';
         }
-        return;
-      case 'eslint.cwd':
-        $this->flags[] = '--resolve-plugins-relative-to ';
-        $this->flags[] = $value;
         return;
     }
     return parent::setLinterConfigurationValue($key, $value);

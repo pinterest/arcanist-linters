@@ -19,7 +19,7 @@
  * Base class for external Node-based linters.
  */
 abstract class NodeExternalLinter extends PinterestExternalLinter {
-  private $cwd = '';
+  protected $cwd = '';
 
   /**
    * Return the name of the external Node-based linter.
