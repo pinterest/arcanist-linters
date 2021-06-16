@@ -67,6 +67,10 @@ final class ESLintLinter extends NodeExternalLinter {
   }
 
   protected function getDefaultFlags() {
+    if ($this->cwd) {
+      $this->flags[] = '--resolve-plugins-relative-to';
+      $this->flags[] = $this->cwd;
+    }
     return $this->flags;
   }
 
@@ -95,12 +99,12 @@ final class ESLintLinter extends NodeExternalLinter {
         $this->flags[] = $value;
         return;
       case 'eslint.env':
-        $this->flags[] = '--env ';
+        $this->flags[] = '--env';
         $this->flags[] = $value;
         return;
       case 'eslint.fix':
         if ($value) {
-          $this->flags[] = '--fix ';
+          $this->flags[] = '--fix';
         }
         return;
     }
