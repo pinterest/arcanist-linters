@@ -23,6 +23,7 @@ final class ESLintLinter extends NodeExternalLinter {
   const ESLINT_ERROR = '2';
 
   private $flags = array();
+  private $parseFixes = false;
 
   public function getInfoName() {
     return 'ESLint';
@@ -84,6 +85,10 @@ final class ESLintLinter extends NodeExternalLinter {
         'type' => 'optional string',
         'help' => pht('Specify environments. To specify multiple environments, separate them using commas. (https://eslint.org/docs/user-guide/command-line-interface#--env)'),
       ),
+      'eslint.fix' => array(
+        'type' => 'optional bool',
+        'help' => pht('Specify whether to patch eslint provided autofixes. (https://eslint.org/docs/user-guide/command-line-interface#fixing-problems)'),
+      ),
     );
     return $options + parent::getLinterConfigurationOptions();
   }
@@ -97,6 +102,11 @@ final class ESLintLinter extends NodeExternalLinter {
       case 'eslint.env':
         $this->flags[] = '--env';
         $this->flags[] = $value;
+        return;
+      case 'eslint.fix':
+        if ($value) {
+          $this->parseFixes = true;
+        }
         return;
     }
     return parent::setLinterConfigurationValue($key, $value);
@@ -156,7 +166,7 @@ final class ESLintLinter extends NodeExternalLinter {
         $message->setCode($this->getLinterName());
 
         $fix = $offense['fix'];
-        if ($fix) {
+        if ($this->parseFixes && $fix) {
           // If there's a fix available, suggest it to the user.
           // We don't want to rely on the --fix flag for eslint because it will
           // silently fix, and then arc won't know it should patch new changes
@@ -180,6 +190,7 @@ final class ESLintLinter extends NodeExternalLinter {
         $messages[] = $message;
       }
     }
+
     return $messages;
   }
 
