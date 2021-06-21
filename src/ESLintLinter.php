@@ -23,6 +23,7 @@ final class ESLintLinter extends NodeExternalLinter {
   const ESLINT_ERROR = '2';
 
   private $flags = array();
+  private $parseFixes = false;
 
   public function getInfoName() {
     return 'ESLint';
@@ -86,7 +87,7 @@ final class ESLintLinter extends NodeExternalLinter {
       ),
       'eslint.fix' => array(
         'type' => 'optional bool',
-        'help' => pht('Specify whether eslint should autofix issues. (https://eslint.org/docs/user-guide/command-line-interface#fixing-problems)'),
+        'help' => pht('Specify whether to patch eslint provided autofixes. (https://eslint.org/docs/user-guide/command-line-interface#fixing-problems)'),
       ),
     );
     return $options + parent::getLinterConfigurationOptions();
@@ -104,7 +105,7 @@ final class ESLintLinter extends NodeExternalLinter {
         return;
       case 'eslint.fix':
         if ($value) {
-          $this->flags[] = '--fix';
+          $this->parseFixes = true;
         }
         return;
     }
@@ -133,14 +134,59 @@ final class ESLintLinter extends NodeExternalLinter {
           continue;
         }
 
+        /**
+         * Example ESLint message:
+         * {
+         *     "ruleId": "prettier/prettier",
+         *     "severity": 2,
+         *     "message": "Replace `(flow.component·&&·flow.component.archived)` \
+         *         with `flow.component·&&·flow.component.archived`",
+         *     "line": 61,
+         *     "column": 10,
+         *     "nodeType": null,
+         *     "messageId": "replace",
+         *     "endLine": 61,
+         *     "endColumn": 53,
+         *     "fix": {
+         *         "range": [
+         *             1462,
+         *             1505
+         *         ],
+         *         "text": "flow.component && flow.component.archived"
+         *     }
+         * },
+         */
+
         $message = new ArcanistLintMessage();
         $message->setPath($file['filePath']);
-        $message->setSeverity($this->mapSeverity(idx($offense, 'severity', '0')));
         $message->setName(nonempty(idx($offense, 'ruleId'), 'unknown'));
         $message->setDescription(idx($offense, 'message'));
         $message->setLine(idx($offense, 'line'));
         $message->setChar(idx($offense, 'column'));
         $message->setCode($this->getLinterName());
+
+        $fix = $offense['fix'];
+        if ($this->parseFixes && $fix) {
+          // If there's a fix available, suggest it to the user.
+          // We don't want to rely on the --fix flag for eslint because it will
+          // silently fix, and then arc won't know it should patch new changes
+          // into the commit.
+          $range = $fix['range'];
+          $rangeStart = $range[0];
+          $rangeEnd = $range[1];
+          $rangeLength = $rangeEnd-$rangeStart;
+          $originalText = $this->getData($path);
+
+          $originalSlice = substr($originalText, $rangeStart, $rangeLength);
+          $message->setOriginalText($originalSlice);
+
+          $replacementSlice = $fix['text'];
+          $message->setReplacementText($replacementSlice);
+          $message->setSeverity(ArcanistLintSeverity::SEVERITY_AUTOFIX);
+        } else {
+          $message->setSeverity($this->mapSeverity(idx($offense, 'severity', '0')));
+        }
+
         $messages[] = $message;
       }
     }
