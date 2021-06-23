@@ -165,8 +165,8 @@ final class ESLintLinter extends NodeExternalLinter {
         $message->setChar(idx($offense, 'column'));
         $message->setCode($this->getLinterName());
 
-        $fix = $offense['fix'];
-        if ($this->parseFixes && $fix) {
+        if ($this->parseFixes && isset($offense['fix'])) {
+          $fix = $offense['fix'];
           // If there's a fix available, suggest it to the user.
           // We don't want to rely on the --fix flag for eslint because it will
           // silently fix, and then arc won't know it should patch new changes
@@ -177,7 +177,8 @@ final class ESLintLinter extends NodeExternalLinter {
           $rangeLength = $rangeEnd-$rangeStart;
           $originalText = $this->getData($path);
 
-          $originalSlice = substr($originalText, $rangeStart, $rangeLength);
+          // Make sure to always use multibyte safe string ranges.
+          $originalSlice = mb_substr($originalText, $rangeStart, $rangeLength);
           $message->setOriginalText($originalSlice);
 
           $replacementSlice = $fix['text'];
