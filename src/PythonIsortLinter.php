@@ -33,7 +33,7 @@ final class PythonIsortLinter extends PythonExternalLinter {
   }
 
   public function getInfoURI() {
-    return 'https://github.com/timothycrosley/isort';
+    return 'https://github.com/PyCQA/isort';
   }
 
   public function getLinterName() {
