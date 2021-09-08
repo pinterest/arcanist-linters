@@ -104,9 +104,9 @@ final class ThriftCheckLinter extends PinterestExternalLinter {
   protected function parseLinterOutput($path, $err, $stdout, $stderr) {
     $lines = phutil_split_lines($stdout, false);
 
-    // file.thrift:3:1:error: unable to find include path for "bar.thrift" (include.path)
+    // file.thrift:3:1: error: unable to find include path for "bar.thrift" (include.path)
     $regexp =
-      '/^(?:.*?):(?P<line>\d+):(?P<char>\d+):(?P<severity>(error|warning)): '.
+      '/^(?:.*?):(?P<line>\d+):(?P<char>\d+): ?(?P<severity>(error|warning)): '.
       '(?P<msg>.*) \((?P<code>.*)\)$/';
 
     $messages = array();
