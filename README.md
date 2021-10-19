@@ -22,6 +22,7 @@ Pinterest.
 - [Python Requirements](#python-requirements)
 - [Spectral](#spectral)
 - [ThriftCheck](#thriftcheck)
+- [YamlLinter](#yamllinter)
 
 We also welcome additional [contributions](CONTRIBUTING.md).
 
@@ -319,6 +320,18 @@ Lints Thrift IDL files using [ThriftCheck](https://github.com/pinterest/thriftch
         ".",
         "common"
     ]
+}
+```
+
+### YamlLinter
+
+Lints YAML files using [YamlLinter](https://yamllint.readthedocs.io/).
+
+```json
+{
+    "type": "yamllint",
+    "include": "(\\.(yml|yaml)$)",
+    "exclude": []
 }
 ```
 
