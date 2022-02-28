@@ -70,12 +70,10 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
     list($err, $stdout, $stderr) = exec_manual('%C --version', $this->getExecutableCommand());
 
     $matches = array();
-    $version = null;
+    $version = false;
 
     if (preg_match('/^(\d\.\d\.\d)$/', $stdout, $matches)) {
       $version = $matches[1];
-    } else {
-      $version = false;
     }
 
     if (!empty($this->dependencyVersions)) {
