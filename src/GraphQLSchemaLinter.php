@@ -28,6 +28,7 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
     'old-implements-syntax' => false,
   );
   private $ignore = null;
+  private $dependencyVersions = array();
 
   public function getInfoName() {
     return 'GraphQLSchema';
@@ -47,6 +48,61 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
 
   public function getLinterConfigurationName() {
     return 'graphql-schema';
+  }
+
+  private function checkVersion($version, $compare_to) {
+    $operator = '==';
+
+    $matches = null;
+    if (preg_match('/^([<>]=?|=)\s*(.*)$/', $compare_to, $matches)) {
+      $operator = $matches[1];
+      $compare_to = $matches[2];
+      if ($operator === '=') {
+        $operator = '==';
+      }
+    }
+
+    return version_compare($version, $compare_to, $operator);
+  }
+
+  public function getVersion() {
+    // Many node packages follow this same convention
+    list($err, $stdout, $stderr) = exec_manual('%C --version', $this->getExecutableCommand());
+
+    $matches = array();
+    $version = false;
+
+    if (preg_match('/^(\d\.\d\.\d)$/', $stdout, $matches)) {
+      $version = $matches[1];
+    }
+
+    if (!empty($this->dependencyVersions)) {
+
+      foreach ($this->dependencyVersions as $name => $required) {
+        list($err, $dep_version, $stderr) = exec_manual('cd .arcanist 2>/dev/null && npm list --depth=0 2>/dev/null | grep "%C" | cut -d "@" -f 3 | tr -d "[:space:]"', $name);
+
+        if (empty($version) || !$this->checkVersion($dep_version, $required)) {
+          $message = pht(
+            "%s requires graphql-schema-linter '%s' dependency version %s.",
+            get_class($this),
+            $name,
+            $required);
+
+          if ($dep_version) {
+            $message .= pht(' You have version %s.', $dep_version);
+          }
+
+          $instructions = $this->getInstallInstructions();
+          if ($instructions) {
+            $message .= "\n".pht('TO UPDATE THE DEPENDENCIES: %s', $instructions);
+          }
+
+          throw new ArcanistMissingLinterException($message);
+        }
+      }
+    }
+
+    return $version;
   }
 
   public function getLinterConfigurationOptions() {
@@ -75,6 +131,10 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
         'type' => 'optional bool',
         'help' => pht('Use old way of defining multiple implemented interfaces (with comma or space) in GraphQL SDL'),
       ),
+      'graphql-schema.dependencies' => array(
+        'type' => 'optional map<string, string>',
+        'help' => pht('Map of dependencies names to version requirments.'),
+      ),
     );
     return $options + parent::getLinterConfigurationOptions();
   }
@@ -98,6 +158,9 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
         return;
       case 'graphql-schema.old-implements-syntax':
         $this->compatibilityOptions['old-implements-syntax'] = $value;
+        return;
+      case 'graphql-schema.dependencies':
+        $this->dependencyVersions = $value;
         return;
     }
     return parent::setLinterConfigurationValue($key, $value);

@@ -165,7 +165,10 @@ Lint GraphQL Schema Definition Language (SDL) using [graphql-schema-linter](http
         ]
     },
     "graphql-schema.comment-descriptions": false,
-    "graphql-schema.old-implements-syntax": false
+    "graphql-schema.old-implements-syntax": false,
+    "graphql-schema.dependencies": {
+        "@pinterest/graphql-lint-rules": "1.0.0"
+    }
 }
 ```
 
