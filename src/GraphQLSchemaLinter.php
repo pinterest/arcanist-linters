@@ -80,9 +80,9 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
 
       foreach ($this->dependencyVersions as $name => $required) {
         $bin_root = dirname($this->getDefaultBinary());
-        list($stdout) = newv('ExecFuture', array('npm list -s --depth=0 --json || true'))
+        list($err, $stdout, $stderr) = newv('ExecFuture', array('npm list -s --depth=0 --json'))
           ->setCWD($bin_root)
-          ->resolvex();
+          ->resolve();
         $json = json_decode($stdout, true);
         $dep_version = !empty($json) ? idxv($json, array('dependencies', $name, 'version')) : null;
 
