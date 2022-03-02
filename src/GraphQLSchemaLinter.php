@@ -79,7 +79,12 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
     if (!empty($this->dependencyVersions)) {
 
       foreach ($this->dependencyVersions as $name => $required) {
-        list($err, $dep_version, $stderr) = exec_manual('cd .arcanist 2>&1 >/dev/null && npm list --depth=0 2>/dev/null | grep "%C" | cut -d "@" -f 3 | tr -d "[:space:]"', $name);
+        $bin_root = dirname($this->getDefaultBinary());
+        list($err, $stdout, $stderr) = newv('ExecFuture', array('npm list -s --depth=0 --json'))
+          ->setCWD($bin_root)
+          ->resolve();
+        $json = json_decode($stdout, true);
+        $dep_version = !empty($json) ? idxv($json, array('dependencies', $name, 'version')) : null;
 
         if (empty($version) || !$this->checkVersion($dep_version, $required)) {
           $message = pht(
