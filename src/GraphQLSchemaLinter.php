@@ -84,7 +84,7 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
           ->setCWD($bin_root)
           ->resolvex();
         $json = json_decode($stdout, true);
-        $dep_version = (isset($json['dependencies']) && isset($json['dependencies'][$name]) && isset($json['dependencies'][$name]['version'])) ? $json['dependencies'][$name]['version'] : null;
+        $dep_version = idxv($json, array('dependencies', $name, 'version');
 
         if (empty($version) || !$this->checkVersion($dep_version, $required)) {
           $message = pht(
