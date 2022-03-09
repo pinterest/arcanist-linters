@@ -77,9 +77,19 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
     }
 
     if (!empty($this->dependencyVersions)) {
+      $bin_path = Filesystem::resolveBinary($this->getDefaultBinary());
+      $bin_root = dirname($bin_path);
+
+      if (empty($bin_root)) {
+        $message = pht(
+          "%s cannot resolve '%s' in the current \$PATH",
+          get_class($this),
+          $this->getDefaultBinary(),
+        );
+        throw new ArcanistMissingLinterException($message);
+      }
 
       foreach ($this->dependencyVersions as $name => $required) {
-        $bin_root = dirname($this->getDefaultBinary());
         list($err, $stdout, $stderr) = newv('ExecFuture', array('npm list -s --depth=0 --json'))
           ->setCWD($bin_root)
           ->resolve();
