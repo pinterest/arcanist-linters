@@ -60,7 +60,7 @@ final class BlackLinter extends PythonExternalLinter {
       '%C --version', $this->getExecutableCommand());
 
     $matches = array();
-    if (preg_match('/version (?P<version>[^\s]+)$/', $stdout, $matches)) {
+    if (preg_match('/(?P<version>\d+\.\d+[^\s]*)/', $stdout, $matches)) {
       return $matches['version'];
     } else {
       return false;
