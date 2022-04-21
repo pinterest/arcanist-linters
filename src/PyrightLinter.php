@@ -20,7 +20,7 @@
  */
 final class PyrightLinter extends NodeExternalLinter {
 
-  private $projectDirectory = null;
+  private $projectPath = null;
   private $typeshedPath = null;
   private $venvPath = null;
 
@@ -55,15 +55,15 @@ final class PyrightLinter extends NodeExternalLinter {
     $options = array(
       'pyright.project' => array(
         'type' => 'optional string',
-        'help' => pht('Use the configuration file at this location (%s)', 'https://github.com/microsoft/pyright/blob/master/docs/configuration.md'),
+        'help' => pht('Use the configuration file at this location relative to project root (%s)', 'https://github.com/microsoft/pyright/blob/master/docs/configuration.md'),
       ),
       'pyright.typeshed-path' => array(
         'type' => 'optional string',
-        'help' => pht('Use typeshed type stubs at this location'),
+        'help' => pht('Use typeshed type stubs at this location, relative to project root'),
       ),
       'pyright.venv-path' => array(
         'type' => 'optional string',
-        'help' => pht('Directory that contains virtual environments'),
+        'help' => pht('Directory that contains virtual environments, relative to project root'),
       ),
     );
     return $options + parent::getLinterConfigurationOptions();
@@ -72,7 +72,7 @@ final class PyrightLinter extends NodeExternalLinter {
   public function setLinterConfigurationValue($key, $value) {
     switch ($key) {
       case 'pyright.project':
-        $this->projectDirectory = $value;
+        $this->projectPath = $value;
         return;
       case 'pyright.typeshed-path':
         $this->typeshedPath = $value;
@@ -82,6 +82,18 @@ final class PyrightLinter extends NodeExternalLinter {
         return;
     }
     return parent::setLinterConfigurationValue($key, $value);
+  }
+
+  public function getProjectPath() {
+    return $this->projectPath ? $this->getEngine()->getFilePathOnDisk($this->projectPath) : null;
+  }
+
+  public function getTypeshedPath() {
+    return $this->typeshedPath ? $this->getEngine()->getFilePathOnDisk($this->typeshedPath) : null;
+  }
+
+  public function getVenvPath() {
+    return $this->venvPath ? $this->getEngine()->getFilePathOnDisk($this->venvPath) : null;
   }
 
   public function getNodeBinary() {
@@ -95,14 +107,14 @@ final class PyrightLinter extends NodeExternalLinter {
   protected function getDefaultFlags() {
     $flags = array();
 
-    if ($this->projectDirectory) {
-      $flags[] = '--project '.$this->projectDirectory;
+    if ($this->getProjectPath()) {
+      $flags[] = '--project='.$this->getProjectPath();
     }
-    if ($this->typeshedPath) {
-      $flags[] = '--typeshed-path '.$this->typeshedPath;
+    if ($this->getTypeshedPath()) {
+      $flags[] = '--typeshed-path='.$this->getTypeshedPath();
     }
-    if ($this->venvPath) {
-      $flags[] = '--venv-path '.$this->venvPath;
+    if ($this->getVenvPath()) {
+      $flags[] = '--venv-path='.$this->getVenvPath();
     }
 
     return $flags;
@@ -170,7 +182,7 @@ final class PyrightLinter extends NodeExternalLinter {
       case 2: // Fatal error occurred with no errors or warnings reported
         throw new Exception(pht("Fatal error while linting %s:\n%s", $path, $stderr));
       case 3: // Config file could not be read or parsed
-        throw new Exception(pht("Could not read config file at %s", $this->projectDirectory));
+        throw new Exception(pht("Could not read config file at %s", $this->getProjectPath()));
       default:
         break;
     }
