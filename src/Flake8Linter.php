@@ -118,7 +118,7 @@ final class Flake8Linter extends PythonExternalLinter {
     $regex =
       '/^(?P<version>\d+\.\d+(?:\.\d+)?) '. # flake8 version
       '\((?P<extensions>.*)\) '.            # extension list
-      '.*(?P<python>\d+\.\d+\.\d+)/';       # python version
+      '.*(?P<python>\d+\.\d+\.\d+)/s';      # python version
     $matches = array();
     if (!preg_match($regex, $stdout, $matches)) {
       return false;
