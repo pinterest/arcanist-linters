@@ -28,6 +28,8 @@ final class Flake8Linter extends PythonExternalLinter {
   private $pythonVersion = null;
   private $extensionVersions = array();
 
+  private $versionInfo = null;
+
   public function getInfoName() {
     return 'Python Flake8 Linter';
   }
@@ -112,18 +114,29 @@ final class Flake8Linter extends PythonExternalLinter {
     return ipull($matches, 2, 1);
   }
 
-  public function getVersion() {
-    list($stdout) = execx('%C --version', $this->getExecutableCommand());
+  protected function getVersionInfo() {
+    if (empty($this->versionInfo)) {
+      list($stdout) = execx('%C --version', $this->getExecutableCommand());
 
-    $regex =
-      '/^(?P<version>\d+\.\d+(?:\.\d+)?) '. # flake8 version
-      '\((?P<extensions>.*)\) '.            # extension list
-      '.*(?P<python>\d+\.\d+\.\d+)/s';      # python version
-    $matches = array();
-    if (!preg_match($regex, $stdout, $matches)) {
-      return false;
+      $regex =
+        '/^(?P<version>\d+\.\d+(?:\.\d+)?) '. # flake8 version
+        '\((?P<extensions>.*)\) '.            # extension list
+        '.*(?P<python>\d+\.\d+\.\d+)/s';      # python version
+      $matches = array();
+      if (preg_match($regex, $stdout, $matches)) {
+        $this->versionInfo = $matches;
+      }
     }
+    return $this->versionInfo;
+  }
 
+  public function getVersion() {
+    $matches = $this->getVersionInfo();
+    return $matches['version'];
+  }
+
+  protected function checkAdditionalVersions() {
+    $matches = $this->getVersionInfo();
     if (!empty($this->pythonVersion) &&
         !$this->checkVersion($matches['python'], $this->pythonVersion)) {
       $message = pht(
@@ -161,8 +174,6 @@ final class Flake8Linter extends PythonExternalLinter {
         }
       }
     }
-
-    return $matches['version'];
   }
 
   public function getInstallInstructions() {
