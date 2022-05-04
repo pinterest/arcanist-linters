@@ -21,6 +21,22 @@
 abstract class PinterestExternalLinter extends ArcanistExternalLinter {
   private $customInstallInstructions = null;
 
+  public function willLintPaths(array $paths) {
+    $this->checkAdditionalVersions();
+    return parent::willLintPaths($paths);
+  }
+
+  /**
+   * Check additional version requirements for the linter
+   * Unlike checkBinaryVersion(), which is run on load,
+   *   these checks only run if the linter matches any paths.
+   * Use this to prevent imposing a linter's requirements on an
+   *   entire repo when only a subset of developers use it.
+   */
+  protected function checkAdditionalVersions() {
+    return;
+  }
+
   public function getInstallInstructions() {
     if ($this->customInstallInstructions) {
       return pht('Install %s using `%s`.', $this->getBinary(), $this->customInstallInstructions);

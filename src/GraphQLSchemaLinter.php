@@ -76,6 +76,10 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
       $version = $matches[1];
     }
 
+    return $version;
+  }
+
+  protected function checkAdditionalVersions() {
     if (!empty($this->dependencyVersions)) {
       $package_root = Filesystem::resolvePath($this->cwd, $this->getProjectRoot());
 
@@ -86,7 +90,7 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
         $json = json_decode($stdout, true);
         $dep_version = !empty($json) ? idxv($json, array('dependencies', $name, 'version')) : null;
 
-        if (empty($version) || !$this->checkVersion($dep_version, $required)) {
+        if (empty($dep_version) || !$this->checkVersion($dep_version, $required)) {
           $message = pht(
             "%s requires graphql-schema-linter '%s' dependency version %s.",
             get_class($this),
@@ -106,8 +110,6 @@ final class GraphQLSchemaLinter extends NodeExternalLinter {
         }
       }
     }
-
-    return $version;
   }
 
   public function getLinterConfigurationOptions() {
