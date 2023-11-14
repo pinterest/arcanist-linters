@@ -21,6 +21,7 @@ Pinterest.
 - [Python isort](#python-isort)
 - [Python Requirements](#python-requirements)
 - [Spectral](#spectral)
+- [Squawk](#squawk)
 - [ThriftCheck](#thriftcheck)
 - [YamlLinter](#yamllinter)
 
@@ -307,6 +308,18 @@ Lints OpenAPI documents using [Spectral](https://stoplight.io/spectral).
     "type": "spectral",
     "include": "(openapi.yaml)",
     "spectral.ruleset": ".spectral.yml",
+}
+```
+
+### Squawk
+
+Lints SQL files using [Squawk](https://squawkhq.com/).
+
+```json
+{
+    "type": "squawk",
+    "include": "(\\.sql)",
+    "spectral.ruleset": ".squawk.toml"
 }
 ```
 
