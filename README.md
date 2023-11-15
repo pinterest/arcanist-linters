@@ -319,7 +319,7 @@ Lints SQL files using [Squawk](https://squawkhq.com/).
 {
     "type": "squawk",
     "include": "(\\.sql)",
-    "spectral.ruleset": ".squawk.toml"
+    "squawk.config": ".squawk.toml"
 }
 ```
 

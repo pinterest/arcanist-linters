@@ -145,7 +145,7 @@ final class SquawkLinter extends NodeExternalLinter {
       $messages[] = id(new ArcanistLintMessage())
         ->setName($this->getLinterName())
         ->setCode($rulename)
-        ->setPath(idx($item, 'source', $path))
+        ->setPath(idx($item, 'file', $path))
         ->setLine($line)
         ->setChar(1)
         ->setDescription($description)
